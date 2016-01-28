@@ -1,94 +1,303 @@
-#!/usr/bin/python
+#/usr/bin/python
 
-### folderize_by_column.py
-### Caleb Matthew Radens
-### 2015_1_26
+# helper_functions.py
+# Caleb Matthew Radens
+# 2016_1_26
 
-### This script parses a file by a specified column, and writes to
-###  file groups of rows that match into their own files. Files are named by their row group. 
-###
-###  Arguments:
-###    input_file.txt: input txt file
-###	 valid filepath   
-###    Column_#: which column to group by
-###	 integer
-###    output_directory/: where should files by written to?
-###      Extant directory
-###    keep_*: which columns from the file to keep when writing new files.
-###      keep_all = keep all columns in new files
-###      keep_0_1_2 = keep first 3 columns in new files
-###      keep_6_2_4 = keep the 7th, 3rd, and 5th columns..
-###
-###  Assumptions:
-###    The file is sorted by the column of interest
-###    The 'Column_#' command line argument is a valid column index
-###	Type = <int>
-###     (0 = first column)
-###    The column of interest has no empty values
-###    The column of interest does not have any rows with value='INITIATED'
-###    The file is not zipped/compressed
-###    The file is a .txt file
-###    There is a single line header
-###
-###  Usage:
-###    python folderize_by_gene.py input_file.txt Column_# output_directory/ keep_*
+### A bunch of helper functions I think I'll use a lot
 
-import sys
 import os
-import gzip
-import csv
 from subprocess import call
+import gzip
 
-print "Initiating folderize_by_column.py"
-print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv) != 5):
-	raise Exception("Expected four command arguments.")
-in_FILE = str(sys.argv[1])
-Column_index = int(sys.argv[2])
-out_DIR = str(sys.argv[3])
-Keep = str(sys.argv[4])
+def remove_all(array, element):
+	""" Remove all instances of element from array.
 
-if (in_FILE[-4:] != ".txt"):
-	raise Exception("Expected 1st command argument to be a file name ending in '.txt'")
-if not (os.path.isfile(in_FILE)):
-	raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
-if not type(Column_index) is int or Column_index < 0:
-	raise Exception("Column index needs to be an integer >= 0.")
-if not (os.path.isdir(out_DIR)):
-	raise ValueError(out_DIR+" not found. Is it a valid directory?")
-if out_DIR[-1] != "/":
-	raise ValueError("The out directory needs to end with a forward slash.")
-if not "keep_" in Keep:
-	raise ValueError("'keep_*' argument needs to start with 'keep_'")
-after_keep = Keep[len("keep_"):]
-if len(after_keep) == 0:
-	raise ValueError("Please specify 'all' or 'col#_col#_etc' after 'keep_'. Saw: "+after_keep)
-if "all" in after_keep:
-	if any(char.isdigit() for char in after_keep):
-		raise ValueError("Please only choose one: 'all' or 'col#_col#_etc' after 'keep_'")
-	if len(after_keep[len("all"):]) > 0:
-		raise ValueError("Expected nothing after 'keep_all' but saw: keep_all"+after_keep)
-	# Temporarily make cols_to_keep = "all" (it will be over-written later)
-	cols_to_keep = "all"
-# Note:
-#	any(char.isdigit() for char in STRING_OF_INTEREST)
-#	This checks if there are any digits in the STRING_OF_INTEREST
-elif any(char.isdigit() for char in after_keep):
-	split_keep = after_keep.split("_")
-	cols_to_keep = list()
-	for keep_col in split_keep:
-		if not keep_col.isdigit:
-			raise ValueError("Expected 'keep_#_#...', but instead of #, saw: "+keep_col)
-		cols_to_keep.append(int(keep_col))
-else:
-	raise ValueError("'keep_*' argument isn't properly formatted. Looked like: "+Keep)
-		
-print "Passed script checks."
-print "Keeping column(s): "+str(cols_to_keep)
+		Arguments:
+			array 	= array type object.
+			element = object that you wish to remove all of from array.
+	"""
+	if type(array) != type([]):
+		raise Exception("Please only give arrays to this function.")
+	n = array.count(element)
+	while n > 0:
+		array.remove(element)
+		n = array.count(element)
 
-all_row_groups = list()
-row_group = "INITIATED"
+def index_all(array, element):
+	"""Return all indeces of array that point to an element.
+
+		Arguments:
+			array 	= array type object.
+			element = object that you wish to get indeces for from array.
+	"""
+	if type(array) != type([]):
+		raise Exception("Please only give arrays to this function.")
+
+	matched_indices = [i for i, x in enumerate(array)if x == element]
+	return matched_indices
+
+def make_scisub_job_command(
+	Script,
+	ScriptDir,
+	Queue = "voight_normal",
+	ErrOut=True,
+	ErrOutDir = "",
+	Extra=""):
+	"""Generate an appropriately formatted string for submitting a *python* job on pmacs.
+	
+	Arguments:
+		Script: 		"script_to_execute.py"
+		ScriptDir: 		"/directory_with_script/"
+		Queue:			Scisub -q command. Should be: "voight_normal" (default),
+							"voight_long", or "voight_priority"
+		ErrOut:			Boolean. Should the job save log files?
+		ErrOutDir:		"/directory_for_log_files/"
+		Extra:			Optional string. If the script takes command line arguments,
+							add them here.
+
+	Depends on: os
+
+	Returns a string formatted for scisub job submission.
+
+		Example usage:
+		make_scisub_job_command(
+			Script="my_script.py",
+			ScriptDir="/project/voight_subrate/.../scripts/",
+			Queue = "voight_normal",
+			ErrOut=True,
+			ErrOutDir = "/project/voight_subrate/.../logs/",
+			Extra="cowabung baby")
+
+		Example output :
+		(note, output is a list of 2 strings with no line breaks/newlines, I just broke them here
+			to ease visualization)
+
+		['bsub -e /project/voight_subrate/.../logs/my_script.err
+			   -o /project/voight_subrate/.../logs/my_script.out
+			   -q voight_normal
+			   python /project/voight_subrate/.../scripts/my_script.py cowabunga baby',
+		'IS_COMMAND']
+	"""
+	if (type(Script) is not str 
+		or type(ScriptDir) is not str 
+		or type(Queue) is not str 
+		or type(ErrOutDir) is not str 
+		or type(Extra) is not str):
+		raise ValueError("All arguments (except ErrOut) need to be strings.")
+	if type(ErrOut) is not bool:
+		raise ValueError("ErrOut needs to be a boolean.")
+
+	if Script[-2:] != "py":
+		raise ValueError("Expected a .py python script, instead got: "+Script)
+
+	if not (os.path.isdir(ScriptDir)):
+		raise ValueError(ScriptDir+" not found.")
+	if ScriptDir[-1] != "/":
+		raise ValueError("ScriptDir needs to end with a forward slash.")
+
+	if not os.path.isfile(ScriptDir+Script):
+		raise ValueError(Script+" not found in "+ScriptDir)
+
+	if (Queue != "voight_normal" 
+		and Queue != "voight_long"
+		and Queue != "voight_priority"):
+		raise ValueError(
+			"Expected voight_normal, voight_long, or voight_priority, instead got: "+Queue)
+
+	if len(ErrOutDir) > 0:	
+		if not (os.path.isdir(ErrOutDir)):
+			raise ValueError(ErrOutDir+" not found.")
+		if ErrOutDir[-1] != "/":
+			raise ValueError("ErrOutDir needs to end with a forward slash.")
+
+	if len(Extra) > 0:
+		# Add space before the extra commands
+		if Extra[0] == " ":
+			raise ValueError("No space in the beginning of Extra, please.")
+		Extra = " "+Extra
+
+	if ErrOut:
+		command = "bsub -e "+ErrOutDir+Script[0:-2]+"err "
+		command = command + "-o "+ErrOutDir+Script[0:-2:]+"out "
+		command = command + "-q "+Queue
+		command = command + " python "+ScriptDir+Script+Extra
+	else:
+		command = "bsub "
+		command = command + "-q "+Queue
+		command = command + " python "+ScriptDir+Script+Extra
+
+	return [command, "IS_SCISUB_COMMAND"]
+
+def submit_scisub_job(Command):
+	""" Given the output from make_scisub_job_command, submit a job.
+	"""
+	if type(Command) is not list:
+		raise ValueError("Command isn't from make_scisub_job_command...(not a list)")
+	if Command[1] != "IS_SCISUB_COMMAND":
+		raise ValueError("Command isn't from make_scisub_job_command...(where is 'IS_SCISUB_COMMAND'?)")
+
+	# Submit a system command
+	call([Command[0]],shell=True)
+
+def make_consign_job_command(
+	Script,
+	ScriptDir,
+	ErrOut=True,
+	ErrOutDir = "",
+	Extra=""):
+	"""Generate an appropriately formatted string for submitting a *python* job on consign.pmacs
+	
+	Arguments:
+		Script: 		"script_to_execute.py"
+		ScriptDir: 		"/directory_with_script/"
+		ErrOut:			Boolean. Should the job save log files?
+		ErrOutDir:		"/directory_for_log_files/"
+		Extra:			Optional string. If the script takes command line arguments,
+							add them here.
+
+	Depends on: os
+
+	Returns a string formatted for consign job submission.
+
+		Example usage:
+		make_consign_job_command(
+			Script="my_script.py",
+			ScriptDir="/project/chrbrolab/.../scripts/",
+			ErrOut=True,
+			ErrOutDir = "/project/chrbrolab/.../logs/",
+			Extra="cowabung baby")
+
+		Example output :
+		(note, output is a list of 2 strings with no line breaks/newlines,
+			 I just broke them here	to ease visualization)
+
+		['bsub 	-e /project/chrbrolab/.../logs/my_script.err
+			-o /project/chrbrolab/.../logs/my_script.out
+			python /project/chrbrolab/.../scripts/my_script.py cowabunga baby',
+		'IS_CONSIGN_COMMAND']
+	"""
+	if (type(Script) is not str 
+		or type(ScriptDir) is not str 
+		or type(ErrOutDir) is not str 
+		or type(Extra) is not str):
+		raise ValueError("All arguments (except ErrOut) need to be strings.")
+	if type(ErrOut) is not bool:
+		raise ValueError("ErrOut needs to be a boolean.")
+
+	if Script[-2:] != "py":
+		raise ValueError("Expected a .py python script, instead got: "+Script)
+
+	if not (os.path.isdir(ScriptDir)):
+		raise ValueError(ScriptDir+" not found.")
+	if ScriptDir[-1] != "/":
+		raise ValueError("ScriptDir needs to end with a forward slash.")
+
+	if not os.path.isfile(ScriptDir+Script):
+		raise ValueError(Script+" not found in "+ScriptDir)
+
+	if len(ErrOutDir) > 0:	
+		if not (os.path.isdir(ErrOutDir)):
+			raise ValueError(ErrOutDir+" not found.")
+		if ErrOutDir[-1] != "/":
+			raise ValueError("ErrOutDir needs to end with a forward slash.")
+
+	if len(Extra) > 0:
+		# Add space before the extra commands
+		if Extra[0] == " ":
+			raise ValueError("No space in the beginning of Extra, please.")
+		Extra = " "+Extra
+
+	if ErrOut:
+		command = "bsub -e "+ErrOutDir+Script[0:-2]+"err "
+		command = command + "-o "+ErrOutDir+Script[0:-2:]+"out "
+		command = command + " python "+ScriptDir+Script+Extra
+	else:
+		command = "bsub "
+		command = command + " python "+ScriptDir+Script+Extra
+
+	return [command, "IS_CONSIGN_COMMAND"]
+
+def submit_consign_job(Command):
+	""" Given the output from make_consign_job_command, submit a job.
+	"""
+	if type(Command) is not list:
+		raise ValueError("Command isn't from make_consign_job_command...(not a list)")
+	if Command[1] != "IS_CONSIGN_COMMAND":
+		raise ValueError("Command isn't from make_consign_job_command...(where is 'IS_CONSIGN_COMMAND'?)")
+
+	# Submit a system command
+	call([Command[0]],shell=True)
+
+def gz_head(File, Dir="", Lines=10):
+	""" Preview top Lines of a file.gz
+
+		Arguments:
+			File: 	"my_fav_file.txt.gz" [needs to be a .gz file]
+			Dir: 	"/my_directory/" [optional, you may make File a the full filepath instead.]
+			Lines:	Integer greater than 0.
+			Split:	Optional string. If 
+	"""
+	if type(File) is not str or type(Dir) is not str:
+		raise ValueError("All arguments need to be strings.")
+	if type(Lines) is not int or Lines < 1:
+		raise ValueError("Lines needs to be an integer > 0.")
+	if len(Dir) > 0:	
+		if not (os.path.isdir(Dir)):
+			raise ValueError(Dir+" not found.")
+		if Dir[-1] != "/":
+			raise ValueError("Dir needs to end with a forward slash.")
+	if File[-2:] != "gz":
+		raise ValueError("File needs to ba a .gz file.")
+	if not os.path.isfile(Dir+File):
+		raise ValueError(File+" not found in directory\n"+Dir)
+
+	path = Dir+File
+	# 'rb' means read
+	f_IN = gzip.open(path, 'rb')
+	for line in f_IN:
+		if Lines == 0:
+			break
+		# Remove newline chars and split by tab
+		split_line = line.rstrip('\r\n').split('\t')
+		print split_line
+		print '\n'
+		Lines = Lines-1
+	f_IN.close()
+
+def my_head(File, Dir="", Lines=10):
+	""" Preview top Lines of a (non gz) file
+
+		Arguments:
+			File: 	"my_fav_file.txt"
+			Dir: 	"/my_directory/" [optional, you may make File a the full filepath instead.]
+			Lines:	Integer greater than 0.
+	"""
+	if type(File) is not str or type(Dir) is not str:
+		raise ValueError("All arguments need to be strings.")
+	if type(Lines) is not int or Lines < 1:
+		raise ValueError("Lines needs to be an integer > 0.")
+	if len(Dir) > 0:	
+		if not (os.path.isdir(Dir)):
+			raise ValueError(Dir+" not found.")
+		if Dir[-1] != "/":
+			raise ValueError("Dir needs to end with a forward slash.")
+	if File[-2:] == "gz":
+		raise ValueError("Please do not use this function on .gz files.")
+	if not os.path.isfile(Dir+File):
+		raise ValueError(File+" not found in directory\n"+Dir)
+
+	path = Dir+File
+	with open(path, 'rb') as the_file:
+		content = the_file.readlines()
+		for line in content:
+			if Lines == 0:
+				break
+			# Remove newline chars and split by tab
+			# split_line = line.rstrip('\r\n').split('\t')
+			print line
+			Lines = Lines-1
 
 def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 	""" Bash sort a file, return location of sorted file.
@@ -130,110 +339,25 @@ def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 
 	in_file_path = In_dir + File
 	out_file_path = Out_dir + File[:-4]+"_sorted.txt"
+	print out_file_path
 	if Header:
 		# Save the header to out_file
 		command = "head " + in_file_path + " -n 1 > " + out_file_path
+		print "bash_sort command looks like: \n"+command
 		call([command], shell= True)
 		# Which column will be sorted by
 		sort_at = str(Col)+","+str(Col)
 		# This sorts the file, but skips the header when sorting it, and writes teh result to file
 		command = "tail -n +2 " + in_file_path + " | sort -k " + sort_at + " >> " + out_file_path
+		print "bash_sort command looks like: \n"+command
 		call([command], shell = True)
 	# Else no header
 	else:
 		# Sort the file at specified column
 		sort_at = str(Col)+","+str(Col)
 		command = "sort "+in_file_path + " -k " + sort_at + " > " + out_file_path
+		print "bash_sort command looks like: \n"+command
 		call([command], shell=True)
 
 	return out_file_path
 
-try:
-	in_FILE = bash_sort(File = in_FILE, 
-				In_dir = "",
-				Out_dir = "",
-				Col = Column_index+1,
-				Header = True)
-except BaseException:
-	raise StandardError("bash_sort failed.")
-
-f_IN = open(in_FILE, 'rb')
-line_i = 1
-for line in f_IN:
-	# Remove newline chars and split by tab
-	split_line = line.rstrip('\r\n').split('\t')
-	# First line is header, save it and look at the next line
-	if line_i == 1:
-		# If you want to keep all columns:
-		if cols_to_keep == "all":
-			# Get number of columns in header of file
-			n_cols = len(split_line)
-			# make keep_col a list of all column indeces
-			cols_to_keep = range(n_cols)
-		# For each # in keep_col list, add the corresponding column from split_line to head
-		head = [split_line[col_i] for col_i in cols_to_keep]
-		line_i = line_i + 1
-		continue
-
-	if split_line[Column_index] == "":
-		raise ValueError("Row value was empty at line: "+str(line_i)+". That's not cool.")
-
-	if row_group == "INITIATED":
-		# Initialize row_group list
-		row_group_list = list()
-		
-		# Extract the value of the first row in the col of interest
-		row_group = split_line[Column_index]
-		# Add row_group to list
-		row_group_list.append(row_group)
-		# Add which line we're at to the list
-		row_group_list.append(line_i)
-
-		# Start saving the head and 1st line of data to row_group file list
-		row_group_file = list()
-		row_group_file.append(head)
-		kept_cols = [split_line[col_i] for col_i in cols_to_keep]
-		row_group_file.append(kept_cols)
-
-	# If this line's row_group is the same as the last, add it to the row_group file list
-	elif split_line[Column_index] == row_group:
-		kept_cols = [split_line[col_i] for col_i in cols_to_keep]
-		row_group_file.append(kept_cols)
-
-	# Check if current line of file's row_group is different from the last line checked
-	elif split_line[Column_index] != row_group:
-		# Add which line was last added (now we have the first and last lines)
-		row_group_list.append(line_i-1)
-		all_row_groups.append(row_group_list)
-
-		# Write the contents of the row_group file list to a csv in its own directory
-		filename = out_DIR+row_group+"/"+row_group+".BED.csv"
-		if not os.path.exists(os.path.dirname(filename)):
-			try:
-				os.makedirs(os.path.dirname(filename))
-			except OSError as exc: # Guard against race condition
-				if exc.errno != errno.EEXIST:
-					raise
-		with open(filename, "wb") as f:
-			writer = csv.writer(f)
-			writer.writerows(row_group_file)
-
-		# Re-initialize summary list
-		row_group_list = list()
-		# Add the first row_group row to the row_group list
-		row_group = split_line[Column_index]
-		row_group_list.append(row_group)
-		row_group_list.append(line_i)
-
-		# Re-initialize file list
-		row_group_file = list()
-		row_group_file.append(head)
-		kept_cols = [split_line[col_i] for col_i in cols_to_keep]
-		row_group_file.append(kept_cols)
-
-	line_i = line_i + 1
-f_IN.close()
-
-for row_group in all_row_groups:
-	print row_group[0]+": "+str(row_group[2]-row_group[1]+1)+" element(s)."
-print "Completed folderize_by_column.py"
