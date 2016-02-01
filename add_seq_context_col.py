@@ -69,9 +69,9 @@ if padding < 0:
 
 for file_name in in_files:
 	# Append base path firectory to file_name
-	file_name = os.path.join(in_dir, file_name)
+	full_file_name = os.path.join(in_dir, file_name)
 	# Open file for reading in binary format
-	with open(file_name, 'rb') as file_handle:
+	with open(full_file_name, 'rb') as file_handle:
 		# Get all lines, removed of \n, from the file, as a list
 		all_lines = file_handle.read().splitlines()
 		# Use operator.itemgetter() to slit each line in the list at delim
@@ -87,9 +87,13 @@ for file_name in in_files:
 		sequences = list()
 		# Add the sequence conext interval for each chr, start, end in file
 		for chrom, start, end in zip(chroms, starts, ends):
-			sequences.append(get_seq_context_interval(chrom, start, end, padding))
+			if chrom == "Y":
+				print "Y chromosomes are ignored. Skipping row in file "+file_name
+				sequences.append("NA")
+			else:
+				sequences.append(get_seq_context_interval(chrom, start, end, padding))
 		columnized = zip(chroms, starts, ends, sequences)
-		with open(file_name,"wb+") as out:
+		with open(full_file_name,"wb+") as out:
 		    csv_out=csv.writer(out)
 		    csv_out.writerow(header)
 		    for row in columnized:
