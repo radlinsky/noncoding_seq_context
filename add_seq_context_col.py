@@ -67,6 +67,10 @@ if chrom_i < 0 or start_i < 0 or end_i < 0:
 if padding < 0:
 	raise ValueError("Padding needs to be an integer >0")
 
+ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
+			"11","12","13","14","15","16","17","18",
+			"19","20","21","22","X"]
+
 for file_name in in_files:
 	# Append base path firectory to file_name
 	full_file_name = os.path.join(in_dir, file_name)
@@ -87,8 +91,8 @@ for file_name in in_files:
 		sequences = list()
 		# Add the sequence conext interval for each chr, start, end in file
 		for chrom, start, end in zip(chroms, starts, ends):
-			if chrom == "Y":
-				print "Y chromosomes are ignored. Skipping row in file "+file_name
+			if chrom not in ACCEPTED_CHROMOSOMES:
+				print "'"+chrom+"' isn't a valid chromosome in file: "+file_name
 				sequences.append("NA")
 			else:
 				sequences.append(get_seq_context_interval(chrom, start, end, padding))
