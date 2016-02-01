@@ -67,6 +67,8 @@ if padding < 0:
 	raise ValueError("Padding needs to be an integer >0")
 
 for file_name in in_files:
+	# Append base path firectory to file_name
+	file_name = os.path.join(in_dir, file_name)
 	# Open file for reading in binary format
 	with open(file_name, 'rb') as file_handle:
 		# Get all lines, removed of \n, from the file, as a list
