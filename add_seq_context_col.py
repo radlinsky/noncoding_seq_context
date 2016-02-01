@@ -67,13 +67,15 @@ if padding < 0:
 	raise ValueError("Padding needs to be an integer >0")
 
 for file_name in in_files:
-	with open(file_name, 'wb+') as file_handle:
+	# Open file for reading in binary format
+	with open(file_name, 'rb') as file_handle:
 		# Get all lines, removed of \n, from the file, as a list
 		all_lines = file_handle.read().splitlines()
 		# Use operator.itemgetter() to slit each line in the list at delim
 		all_lines = map(methodcaller("split", delim), all_lines)
 	# Pop the header from the list of lines
 	header = all_lines.pop(0)
+	header.append("sequence_context_interval")
 	if len(all_lines) > 0:
 		# Use operator.itemgetter() to get all index-specified elements from list of lines
 		chroms = map(itemgetter(chrom_i), all_lines)
@@ -82,9 +84,13 @@ for file_name in in_files:
 		sequences = list()
 		# Add the sequence conext interval for each chr, start, end in file
 		for chrom, start, end in zip(chroms, starts, ends):
-			sequences.append(get_seq_context_interval(chrom, start, end))
+			sequences.append(get_seq_context_interval(chrom, start, end, padding))
 		columnized = zip(chroms, starts, ends, sequences)
-		print columnized
+		with open(file_name,"wb+") as out:
+		    csv_out=csv.writer(out)
+		    csv_out.writerow(header)
+		    for row in columnized:
+			csv_out.writerow(row)
 
 			
 	else:
