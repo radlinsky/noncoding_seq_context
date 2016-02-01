@@ -35,6 +35,7 @@ from operator import methodcaller, itemgetter
 varun_scripts = "/project/voight_subrate/avarun/Research/mutation_rate/scripts_for_folks"
 sys.path.append(varun_scripts)
 from find_context import get_seq_context_interval
+import csv
 
 print "Initiating add_seq_context_col.py"
 print "Argument List:", str(sys.argv[1:])
