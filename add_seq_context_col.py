@@ -87,7 +87,7 @@ in_files = list()
 for root, subdirs, files in os.walk(in_dir):
 	for f in files:
 		if ".BED" in f:
-			in_files.append(os.join(root,f))
+			in_files.append(os.path.join(root,f))
 
 for full_file_name in in_files:
 	# Get base of full_file_name
