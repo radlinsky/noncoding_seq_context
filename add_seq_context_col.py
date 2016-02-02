@@ -62,7 +62,7 @@ padding = int(sys.argv[6])
 if not (os.path.isdir(in_dir)):
 	raise ValueError(in_dir+" not found. Is it a valid directory?")
 
-out_dir = "/"+os.path.basename(in_dir)+"_seq_context/"
+out_dir = os.path.basename(os.path.dirname(in_dir))+"_seq_context/"
 out_dir = os.path.join(in_dir, out_dir)
 
 # Extract names of all files in in_dir
