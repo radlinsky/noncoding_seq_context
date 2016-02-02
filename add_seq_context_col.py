@@ -33,7 +33,7 @@
 ###    On Varun's get_seq_context_interval module [see file path below]
 ###
 ###  Usage:
-###    python folderize_by_gene.py input_dir/ output_dir/ delim chrom start end before_after
+###    python folderize_by_gene.py input_dir/ delim chrom start end before_after
 
 import sys
 import os
@@ -50,15 +50,14 @@ import csv
 print "Initiating add_seq_context_col.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 7):
-	raise Exception("Expected six command arguments.")
+if (len(sys.argv)-1 != 6):
+	raise Exception("Expected five command arguments.")
 in_dir = str(sys.argv[1])
-out_dir = str(sys.argv[2])
-delim = str(sys.argv[3])
-chrom_i = int(sys.argv[4])
-start_i = int(sys.argv[5])
-end_i = int(sys.argv[6])
-padding = int(sys.argv[7])
+delim = str(sys.argv[2])
+chrom_i = int(sys.argv[3])
+start_i = int(sys.argv[4])
+end_i = int(sys.argv[5])
+padding = int(sys.argv[6])
 
 if not (os.path.isdir(in_dir)):
 	raise ValueError(in_dir+" not found. Is it a valid directory?")
