@@ -4,9 +4,9 @@
 ### Caleb Matthew Radens
 ### 2015_2_2
 
-### This script appends a column of hg19 reference genome sequence to each file in a folder of files
-### 	that each has chr, start, and end positions as columns. Discards all other columns. Output
-###	is saved in a sub-directory with '_seq_context' appended to the root file name.
+### This script appends a column of hg19 reference genome sequence to all .BED files in a folder
+### 	that have chr, start, and end positions as columns. Discards all other columns. Output
+###	is saved as a new file with '.seq_context' appended to the root file name.
 ###
 ###  Arguments:
 ###	input_directory/: where are the files located? 
@@ -25,9 +25,11 @@
 ###  Assumptions:
 ###    All files are structured and deliminated identically
 ###    There are single line headers for each file
+###    Files end in '.txt' or '.csv' or anything of the format '.NNN'
 ###  
 ###  Notes:
 ###    Any row with a non-acceptable chromosome (1:23 and X) will be skipped: NA instead of sequence
+###    Recursively gets all files in directory that contain '.BED' but lack '.seq_context'
 ###
 ###  Depends:
 ###    On Varun's get_seq_context_interval module [see file path below]
@@ -62,14 +64,11 @@ padding = int(sys.argv[6])
 if not (os.path.isdir(in_dir)):
 	raise ValueError(in_dir+" not found. Is it a valid directory?")
 
-out_dir = os.path.basename(os.path.dirname(in_dir))+"_seq_context/"
-out_dir = os.path.join(in_dir, out_dir)
-
 # Extract names of all files in in_dir
 in_files = os.listdir(in_dir)
 
 if len(in_files) <= 0:
-	raise Exception("No files found in directory.")
+	raise Exception("No files or folders found in directory.")
 
 if len(delim) <= 0:
 	raise ValueError("delim must be of length > 0")
@@ -84,9 +83,15 @@ ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
 			"19","20","21","22","X"]
 
-for file_name in in_files:
-	# Append base path firectory to file_name
-	full_file_name = os.path.join(in_dir, file_name)
+in_files = list()
+for root, subdirs, files in os.walk(home_base):
+	for f in files:
+		if ".BED" in f:
+			in_files.append(os.join(root,f))
+
+for full_file_name in in_files:
+	# Get base of full_file_name
+	file_name = os.path.basename(full_file_name)
 	# Open file for reading in binary format
 	with open(full_file_name, 'rb') as file_handle:
 		# Get all lines, removed of \n, from the file, as a list
@@ -127,16 +132,9 @@ for file_name in in_files:
 
 		columnized = zip(chroms, starts, ends, sequences)
 
-		# If sub-directory doesn't exist yet, make it:
-		out_file_path = os.path.join(out_dir, file_name)
-		print out_file_path
-		if not os.path.exists(os.path.dirname(out_file_path)):
-		    try:
-			os.makedirs(os.path.dirname(out_file_path))
-		    except OSError as exc: # Guard against race condition
-			if exc.errno != errno.EEXIST:
-			    raise
-
+		# Add '.seq_context' before the filetype and write to file
+		file_type = full_file_name[-4:]
+		out_file_path = full_file_name[:-4]+".seq_context"+file_type
 		with open(out_file_path,"wb+") as out:
 		    csv_out=csv.writer(out)
 		    csv_out.writerow(header)
