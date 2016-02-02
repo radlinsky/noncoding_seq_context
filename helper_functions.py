@@ -15,11 +15,11 @@ def remove_all(array, element):
 	""" Remove all instances of element from array.
 
 		Arguments:
-			array 	= array type object.
+			array 	= type: list.
 			element = object that you wish to remove all of from array.
 	"""
-	if type(array) != type([]):
-		raise Exception("Please only give arrays to this function.")
+	if not isinstance(array, list):
+		raise Exception("Please only give lists to this function.")
 	n = array.count(element)
 	while n > 0:
 		array.remove(element)
@@ -29,11 +29,11 @@ def index_all(array, element):
 	"""Return all indeces of array that point to an element.
 
 		Arguments:
-			array 	= array type object.
+			array 	= type: list.
 			element = object that you wish to get indeces for from array.
 	"""
-	if type(array) != type([]):
-		raise Exception("Please only give arrays to this function.")
+	if not isinstance(array, list):
+		raise Exception("Please only give lists to this function.")
 
 	matched_indices = [i for i, x in enumerate(array)if x == element]
 	return matched_indices
