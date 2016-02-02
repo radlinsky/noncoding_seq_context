@@ -118,9 +118,10 @@ for file_name in in_files:
 			continue
 
 		columnized = zip(chroms, starts, ends, sequences)
-		
+
 		# If sub-directory doesn't exist yet, make it:
 		out_file_path = os.path.join(out_dir, file_name)
+		print out_file_path
 		if not os.path.exists(os.path.dirname(out_file_path)):
 		    try:
 			os.makedirs(os.path.dirname(out_file_path))
