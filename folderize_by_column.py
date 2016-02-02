@@ -5,7 +5,7 @@
 ### 2015_2_2
 
 ### This script parses a file by a specified column, and writes to
-###  file groups of rows that match. Files are csvs named: row_group.txt
+###  file groups of rows that match. Files are named by their row group. 
 ###
 ###  Arguments:
 ###    input_file.txt: input txt file
@@ -40,7 +40,7 @@ import gzip
 import csv
 from subprocess import call
 
-print "Initiating fileize_by_column.py"
+print "Initiating folderize_by_column.py"
 print "Argument List:", str(sys.argv[1:])
 
 if (len(sys.argv) != 5):
@@ -208,7 +208,13 @@ for line in f_IN:
 		all_row_groups.append(row_group_list)
 
 		# Write the contents of the row_group file list to a csv in its own directory
-		filename = out_DIR+row_group+".BED.csv"
+		filename = out_DIR+row_group+"/"+row_group+"/"+row_group+".BED.csv"
+		if not os.path.exists(os.path.dirname(filename)):
+			try:
+				os.makedirs(os.path.dirname(filename))
+			except OSError as exc: # Guard against race condition
+				if exc.errno != errno.EEXIST:
+					raise
 		with open(filename, "wb") as f:
 			writer = csv.writer(f)
 			writer.writerows(row_group_file)
