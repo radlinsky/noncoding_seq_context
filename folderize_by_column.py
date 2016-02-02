@@ -208,7 +208,7 @@ for line in f_IN:
 		all_row_groups.append(row_group_list)
 
 		# Write the contents of the row_group file list to a csv in its own directory
-		filename = out_DIR+row_group+"/"+row_group+"/"+row_group+".BED.csv"
+		filename = out_DIR+row_group+"/"+row_group+".BED.csv"
 		if not os.path.exists(os.path.dirname(filename)):
 			try:
 				os.makedirs(os.path.dirname(filename))
