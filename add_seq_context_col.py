@@ -84,7 +84,7 @@ ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"19","20","21","22","X"]
 
 in_files = list()
-for root, subdirs, files in os.walk(home_base):
+for root, subdirs, files in os.walk(in_dir):
 	for f in files:
 		if ".BED" in f:
 			in_files.append(os.join(root,f))
