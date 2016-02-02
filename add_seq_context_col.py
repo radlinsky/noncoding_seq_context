@@ -94,7 +94,15 @@ for file_name in in_files:
 		# Use operator.itemgetter() to slit each line in the list at delim
 		all_lines = map(methodcaller("split", delim), all_lines)
 	# Pop the header from the list of lines
-	header = all_lines.pop(0)
+	orig_header = all_lines.pop(0)
+	cols_to_keep = [chrom_i, start_i, end_i]
+	# Sort cols to keep, lowest to highest
+	cols_to_keep.sort(reverse=True)
+	# Build new header, using original header names, maintaining order:
+	header = list()
+	for i in cols_to_keep:
+		header.insert(0,orig_header.pop(i))
+	# Add new column to header
 	header.append("sequence_context_interval")
 	if len(all_lines) > 0:
 		# Use operator.itemgetter() to get all index-specified elements from list of lines
