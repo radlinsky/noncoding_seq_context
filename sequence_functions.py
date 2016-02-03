@@ -55,7 +55,7 @@ def get_variant_dict(Pop):
 	pop_files = list()
 	for root, subdirs, files in os.walk(pop_dir):
 		for f in files:
-			if len(f) == 19 and "all_var" in f and "chr_loc" in f and pop in f:
+			if len(f) == 19 and "all_var" in f and "chr_loc" in f and Pop in f:
 				pop_files.append(os.path.join(root,f))
 
 	if len(pop_files) > 1:
