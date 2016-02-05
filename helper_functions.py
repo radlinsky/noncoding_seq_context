@@ -361,3 +361,58 @@ def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 
 	return out_file_path
 
+def grep_for_files(Dir, Pattern):
+	"""Search a directory (recursively) for files that contain 'Pattern' in their name.
+
+		Arguments:
+			Dir:	"/my_directory/"
+			Pattern:"pattern_to_match"
+
+		Assumptions:
+			Dir is extant
+			Pattern is non-empty
+		
+		Returns:
+			A list of files that matched (full file path!) - will be [] if no matches.
+	"""
+	if type(Dir) is not str or type(Pattern) is not str:
+		raise ValueError("Dir and Pattern need to be strings.")
+
+	if not (os.path.isdir(Dir)):
+		raise ValueError(Dir+" not found.")
+
+	if len(Pattern) == 0:
+		raise ValueError("Pattern was an empty string. It should not be an empty string.")
+
+	matched_files = list()
+	for root, subdirs, files in os.walk(Dir):
+		# ID files that contain the Pattern
+		for f in files:
+			if Pattern in f:
+				matched_files.append(os.path.join(root,f))
+	return matched_files
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
