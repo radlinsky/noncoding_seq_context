@@ -48,7 +48,7 @@ def get_variant_dict(Pop):
 	if not isinstance(Pop, str):
 		raise ValueError("Pop needs to be a string.")
 	
-	print "Initiating get_variant_dict(Pop = "+Pop+")
+	print "Initiating get_variant_dict(Pop = "+Pop+")"
 
 	if Pop not in expected_pops:
 		raise ValueError("Expected valid POP name, but received: "+Pop)
