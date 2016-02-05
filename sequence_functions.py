@@ -77,7 +77,7 @@ def get_variant_dict(Pop):
 			variant_info = line[2:]
 			# dictionary:
 			# chr -> loci -> variant_info
-			if len(pop_dict[chrom]) == 0:
+			if not pop_dict.has_key(chrom):
 				pop_dict[chrom]=dict({loci:variant_info})
 			else:
 				pop_dict[chrom][loci] = variant_info
