@@ -37,7 +37,7 @@ def get_variant_dict(Pop):
 		Population variant files have 7 columns without headers:
 			chr | loci | ref_allele | variant_allele | ancesteral_allele | rsid | MAF
 	"""
-
+	
 	expected_pops = ['ASW', 'TSI', 'PUR',
 	 		'CHB', 'GBR', 'EUR',
 	 		'CLM', 'AFR', 'ASN',
@@ -47,6 +47,8 @@ def get_variant_dict(Pop):
 
 	if not isinstance(Pop, str):
 		raise ValueError("Pop needs to be a string.")
+	
+	print "Initiating get_variant_dict(Pop = "+Pop+")
 
 	if Pop not in expected_pops:
 		raise ValueError("Expected valid POP name, but received: "+Pop)
@@ -81,3 +83,5 @@ def get_variant_dict(Pop):
 				pop_dict[chrom]=dict({loci:variant_info})
 			else:
 				pop_dict[chrom][loci] = variant_info
+	print "get_variant_dict(Pop = "+Pop+") complete."
+	return pop_dict
