@@ -100,7 +100,7 @@ for root, subdirs, files in os.walk(in_dir):
 								os.path.basename(directory)+"."+pop+".SNV")
 					with open(new_file, 'wb+') as out_file:
 						writer = csv.writer(out_file)
-						writer.writerows(row_group_file)
+						writer.writerows(snv_data)
 			i = i + 1
 			
 		
