@@ -75,6 +75,7 @@ for root, subdirs, files in os.walk(in_dir):
 				if i == 0:
 					i = i + 1
 					continue
+				line = line.split(",")
 				chrom = line[0]
 				start = line[1]
 				end = line[2]

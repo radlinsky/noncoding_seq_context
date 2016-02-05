@@ -67,7 +67,7 @@ def get_variant_dict(Pop):
 		raise StandardError("Population not found in directory for some reason...")
 
 	# map(function, list_or_things_to_apply_function_to)
-	print "Population file to be anayzed:"+str(map(os.path.basename, pop_files))
+	print "Population file to be analyzed:"+str(map(os.path.basename, pop_files))
 
 	pop_dict = dict()
 	with open(pop_files[0], 'rb') as file_handle:
