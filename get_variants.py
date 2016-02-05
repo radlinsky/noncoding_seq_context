@@ -2,23 +2,13 @@
 
 ### get_variants.py
 ### Caleb Matthew Radens
-### 2015_2_2
+### 2015_2_5
 
-### Get the SNVs in a given region of the genome from all populations.
+### Get SNV info from a given region of the genome from a user-specified population.
 ###
-### Given a directory with folders that contain .BED files that each have 'seq_context' column,
-### 	look up what variants are in the sequence context, and write a new file with the variants.
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
+### Given a directory, recursively search all folders for '.seq_context' files, look up what
+### 	variants are within the sequence context for a specified population from 1000G, then write
+### 	a separate file with the variant information in the same directory as the .seq_context file.
 ###
 ### Assumptions:
 ###	Population variant files are permenantly located at:
@@ -27,17 +17,11 @@
 ###	Population variant files have 7 columns without headers:
 ###		chr | loci | ref_allele | variant_allele | ancesteral_allele | rsid | MAF
 ###
-###
-###
-###
-###
-###
-###
-###
-###
+### Depends on:
+###  /project/voight_subrate/cradens/noncoding_seq_context/script/sequence_functions.py
 ###
 ###  Usage:
-###    python get_variants.py input_dir/ pop
+###    python get_variants.py input_dir/ POP
 
 import sys
 import os
@@ -60,6 +44,7 @@ if not (os.path.isdir(in_dir)):
 	raise ValueError(in_dir+" not found. Is it a valid directory?")
 
 pop_dict = get_variant_dict(Pop = pop)
+# pop_dict[chrom]-> chrom_dict[loci] -> SNV_data
 
 bed_files = list()
 for root, subdirs, files in os.walk(in_dir):
@@ -68,51 +53,43 @@ for root, subdirs, files in os.walk(in_dir):
 		if ".seq_context" in f:
 			bed_files.append(os.path.join(root,f))
 	
-	for bed_file in bed_files:
-		with open(bed_file, 'rb') as in_file:
-			i = 0
-			for line in in_file:
-				# Skip header
-				if i == 0:
-					i = i + 1
-					continue
-				# Split line at ','
-				line = line.split(",")
-				chrom = line[0]
-				start = line[1]
-				end = line[2]
-				snv_data = list()
-				if pop_dict.has_key(chrom):
-					chrom_dict = pop_dict[chrom]
-					for loci in xrange(int(start), int(end)+1):
-						if chrom_dict.has_key(str(loci)):
-							line_to_save = list()
-							line_to_save.append(chrom)
-							line_to_save.append(str(loci))
-							line_to_save.extend(chrom_dict[str(loci)])
-							snv_data.append(line_to_save)
-				else:
-					raise StandardError("Chromosome '"+chrom+"' not in pop_dict.")
-				# If varaints were found, write them to file
-				if len(snv_data) != 0:
-					directory = os.path.dirname(bed_file)
-					new_file = os.path.join(directory,
-								os.path.basename(directory)+"."+pop+".SNV")
-					with open(new_file, 'wb+') as out_file:
-						writer = csv.writer(out_file)
-						writer.writerows(snv_data)
-				else:
-					print "No variants found for:\n"+bed_file
+for bed_file in bed_files:
+	with open(bed_file, 'rb') as in_file:
+		i = 0
+		snv_data = list()
+		for line in in_file:
+			# Skip header
+			if i == 0:
+				i = i + 1
+				continue
+			# Split line at ','
+			line = line.split(",")
+			chrom = line[0]
+			start = line[1]
+			end = line[2]
+			# If the dictionary has key == chromosome of interest
+			if pop_dict.has_key(chrom):
+				chrom_dict = pop_dict[chrom]
+				# Dictionary keys and values are all strings
+				#  xrange(0:3) = [0,1,2]
+				for loci in xrange(int(start), int(end)+1):
+					if chrom_dict.has_key(str(loci)):
+						line_to_save = list()
+						line_to_save.append(chrom)
+						line_to_save.append(str(loci))
+						line_to_save.extend(chrom_dict[str(loci)])
+						snv_data.append(line_to_save)
+			else:
+				raise StandardError("Chromosome '"+chrom+"' not in pop_dict.")
 			i = i + 1
-			
-		
-
-
-
-# python get_variants.py /project/voight_subrate/cradens/noncoding_seq_context/data/results/ensemble_grch37/miRNA/ENSG00000221524/ EUR
-
-
-
-
-
-
+		# If varaints were found, write them to file
+		if len(snv_data) != 0:
+			directory = os.path.dirname(bed_file)
+			new_file = os.path.join(directory,
+						os.path.basename(directory)+"."+pop+".SNV")
+			with open(new_file, 'wb+') as out_file:
+				writer = csv.writer(out_file)
+				writer.writerows(snv_data)
+			print str(len(snv_data))+" variants found in file:\n"+bed_file
+		else:
+			print "No variants found in file:\n"+bed_file

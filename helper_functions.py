@@ -392,11 +392,36 @@ def grep_for_files(Dir, Pattern):
 				matched_files.append(os.path.join(root,f))
 	return matched_files
 
+def new_sub_dir_file(File_path, Appendage):
+	"""Given a file path, return a new file path in the same directory with an appended text
+		to the parent diretcory of the file_path.
 
+		example:File_path = "/HOME/.../my_dir/hello_world.care_bears"
+			Appendage = ".SEQ"
+			returns: "/HOME/.../my_dir/my_dir.SEQ"	 
 
+		Arguments:
+			File_path:	".../my_directory/my_file"
+			Appendage:"string_to_append_to_new_file_path"
 
+		Assumptions:
+			File_path points to real file
+			Appendage is non-empty
+		
+		Returns:
+			A string (the new file_path)
+	"""
+	if type(File_path) is not str or type(Appendage) is not str:
+		raise ValueError("File_path and Appendage need to be strings.")
 
+	if not (os.path.isfile(File_path)):
+		raise ValueError(File_path+" not found.")
 
+	if len(Appendage) == 0:
+		raise ValueError("Appendage was an empty string. It should not be an empty string.")
+	directory = os.path.dirname(File_path)
+	new_file = os.path.join(directory, os.path.basename(directory)+Pattern)
+	return new_file
 
 
 
