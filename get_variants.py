@@ -63,10 +63,11 @@ pop_dict = get_variant_dict(Pop = pop)
 
 bed_files = list()
 for root, subdirs, files in os.walk(in_dir):
+	# ID files that I know have sequence context in them
 	for f in files:
 		if ".seq_context" in f:
 			bed_files.append(os.path.join(root,f))
-
+	
 	for bed_file in bed_files:
 		with open(bed_file, 'rb') as in_file:
 			i = 0
@@ -75,6 +76,7 @@ for root, subdirs, files in os.walk(in_dir):
 				if i == 0:
 					i = i + 1
 					continue
+				# Split line at ','
 				line = line.split(",")
 				chrom = line[0]
 				start = line[1]
@@ -92,7 +94,7 @@ for root, subdirs, files in os.walk(in_dir):
 				else:
 					raise StandardError("Chromosome '"+chrom+"' not in pop_dict.")
 				if len(snv_data) == 0:
-					print "No variants found for: "+new_file 
+					print "No variants found for: "+str(os.path.basename(in_file))
 				else:
 					directory = os.path.dirname(bed_file)
 					new_file = os.path.join(directory,
