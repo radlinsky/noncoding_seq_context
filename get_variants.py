@@ -101,6 +101,8 @@ for root, subdirs, files in os.walk(in_dir):
 					with open(new_file, 'wb+') as out_file:
 						writer = csv.writer(out_file)
 						writer.writerows(snv_data)
+				else:
+					print "No variants found for:\n"+bed_file
 			i = i + 1
 			
 		
