@@ -93,9 +93,8 @@ for root, subdirs, files in os.walk(in_dir):
 							snv_data.append(line_to_save)
 				else:
 					raise StandardError("Chromosome '"+chrom+"' not in pop_dict.")
-				if len(snv_data) == 0:
-					print "No variants found for: "+str(os.path.basename(in_file))
-				else:
+				# If varaints were found, write them to file
+				if len(snv_data) != 0:
 					directory = os.path.dirname(bed_file)
 					new_file = os.path.join(directory,
 								os.path.basename(directory)+"."+pop+".SNV")
