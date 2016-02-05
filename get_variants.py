@@ -81,12 +81,12 @@ for root, subdirs, files in os.walk(in_dir):
 				snv_data = list()
 				if pop_dict.has_key(chrom):
 					chrom_dict = pop_dict[chrom]
-					for loci in xrange(start, end+1):
-						if chrom_dict.has_key(loci):
+					for loci in xrange(int(start), int(end)+1):
+						if chrom_dict.has_key(str(loci)):
 							line_to_save = list()
 							line_to_save.append(chrom)
-							line_to_save.append(loci)
-							line_to_save.extend(chrom_dict[loci])
+							line_to_save.append(str(loci))
+							line_to_save.extend(chrom_dict[str(loci)])
 							snv_data.append(line_to_save)
 				else:
 					raise StandardError("Chromosome '"+chrom+"' not in pop_dict.")
