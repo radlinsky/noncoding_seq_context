@@ -51,7 +51,7 @@ from sequence_functions import get_variant_dict
 print "Initiating get_variants.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 3):
+if (len(sys.argv)-1 != 2):
 	raise Exception("Expected two command arguments.")
 in_dir = str(sys.argv[1])
 pop = str(sys.argv[2])
@@ -105,7 +105,7 @@ for root, subdirs, files in os.walk(in_dir):
 
 
 
-
+# python get_variants.py /project/voight_subrate/cradens/noncoding_seq_context/data/results/ensemble_grch37/miRNA/ENSG00000221524/ EUR
 
 
 
