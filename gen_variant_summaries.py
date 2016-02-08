@@ -11,12 +11,13 @@
 ###
 ### Arguments:
 ###     in_dir
-###         extant directory   
+###         extant directory with sub-directories that contain .SNV files   
 ###     out_file: where should the summary file be written to?
 ###
 ### Assumptions:
 ###     in_dir has sub-directories that contain .SNV files
 ###         These sub-dirs are named after a sequence of interest (e.g. 'ENSG...###')
+###         There aren't sub-sub-dirs that contain .'SNV' files
 ###     SNV files are not zipped
 ###     There are no headers in the .SNV files
 ###
@@ -32,7 +33,7 @@ home_base = "/project/voight_subrate/cradens/noncoding_seq_context/script/"
 sys.path.append(home_base)
 from sequence_functions import n_variants
 
-pdb.set_trace()
+#pdb.set_trace()
 
 print "Initiating gen_variant_summaries.py"
 print "Argument List:", str(sys.argv[1:])
@@ -46,17 +47,20 @@ if not (os.path.isdir(in_DIR)):
     raise ValueError("Input directory not found.")
 
 # Find all '.SNV" files in their respective sub directories
-sub_dirs_with_snv_files = dict()
+sub_dirs = dict()
 for root, subdirs, files in os.walk(in_DIR):  
+    # Add all sub_dirs as dict keys
+    for subdir in subdirs:
+        sub_dirs[subdir] = list()
     for f in files:
         # If .SNV file in the directory
         if ".SNV" in f:
             # If the dictionary doesn't have the sub-dir defined as a key yet
-            if not sub_dirs_with_snv_files.has_key(root):
-                # Add the directory as a key -> list()
-                sub_dirs_with_snv_files[root] = list()
+            if not sub_dirs.has_key(root):
+                raise StandardError("Expected all dirs with .SNV files to be in dict.")
+            
             # Add the matched file to the list in the sub directory
-            sub_dirs_with_snv_files[root].append(os.path.join(root,f))
+            sub_dirs[root].append(os.path.join(root,f))
 
 possible_pops = ['ASW', 'TSI', 'PUR',
          'CHB', 'GBR', 'EUR',
@@ -74,9 +78,10 @@ summary_data.append(header)
 
 empty_pop_data = [0]*len(possible_pops)
 
-keys = sub_dirs_with_snv_files.viewkeys()
+keys = sub_dirs.viewkeys()
 for directory in keys:
-    snv_files = sub_dirs_with_snv_files[directory]
+    snv_files = sub_dirs[directory]
+         
     summary_row = list()    
     dir_basename = os.path.basename(directory)
     # Add ensembleID name to summary row
@@ -95,12 +100,14 @@ for directory in keys:
         # Get the number of SNVs
         n_pop_snvs = n_variants(directory, pop)
         
+        # Make sure there insa't already data for the population:
+        if summary_row[summary_row_pop_col] != 0:
+            raise StandardError("Overwriting SNV data... that's not good.")
         # Update 0 -> number of SNVs
         summary_row[summary_row_pop_col] = n_pop_snvs
     
     # Add the ensembleID data row to the full list
     summary_data.append(summary_row)
-    
     
 with open(out_FILE, 'wb') as f:
     writer = csv.writer(f)
