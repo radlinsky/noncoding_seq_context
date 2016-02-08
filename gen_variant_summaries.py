@@ -52,7 +52,7 @@ for root, subdirs, files in os.walk(in_DIR):
         # If .SNV file in the directory
         if ".SNV" in f:
             # If the dictionary doesn't have the sub-dir defined as a key yet
-            if not sub_dirs_with_snv_files.has_key():
+            if not sub_dirs_with_snv_files.has_key(root):
                 # Add the directory as a key -> list()
                 sub_dirs_with_snv_files[root] = list()
             # Add the matched file to the list in the sub directory
