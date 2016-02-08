@@ -40,7 +40,7 @@ print "Argument List:", str(sys.argv[1:])
 if (len(sys.argv)-1 != 2):
     raise Exception("Expected two command arguments.")
 in_DIR = str(sys.argv[1])
-out_FILE = int(sys.argv[2])
+out_FILE = str(sys.argv[2])
 
 if not (os.path.isdir(in_DIR)):
     raise ValueError("Input directory not found.")
