@@ -70,11 +70,13 @@ summary_data = list()
 header = list()
 header.append("ensembleID")
 header.extend(possible_pops)
-
+summary_data.extend(header)
 
 empty_pop_data = [0]*len(possible_pops)
 
-for directory, snv_files in sub_dirs_with_snv_files:
+keys = sub_dirs_with_snv_files.viewkeys()
+for directory in keys:
+    snv_files = sub_dirs_with_snv_files[directory]
     summary_row = list()    
     dir_basename = os.path.basename(directory)
     # Add ensembleID name to summary row
