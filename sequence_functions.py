@@ -129,7 +129,7 @@ def n_variants(Directory, Pop):
 			n_files = n_files+1
 			if n_files > 1:
 				raise ValueError("More than one file matched "+"."+Pop+".SNV in Directory.")
-			with open(f, 'rb') as file_handle:
+			with open(os.path.join(Directory,f), 'rb') as file_handle:
 				content = file_handle.readlines()
 				for line in content:
 					n_snvs = n_snvs + 1
