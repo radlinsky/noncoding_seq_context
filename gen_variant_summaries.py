@@ -70,7 +70,7 @@ summary_data = list()
 header = list()
 header.append("ensembleID")
 header.extend(possible_pops)
-summary_data.extend(header)
+summary_data.append(header)
 
 empty_pop_data = [0]*len(possible_pops)
 
