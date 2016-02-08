@@ -85,3 +85,50 @@ def get_variant_dict(Pop):
 				pop_dict[chrom][loci] = variant_info
 	print "get_variant_dict(Pop = "+Pop+") complete."
 	return pop_dict
+
+def n_variants(Directory, Pop):
+	"""
+	Given a directory with SNV data from a given Population,
+		count how many SNVs are present.
+	
+	Arguments:
+		Directory: /extant_dir/
+			Must contain SNV data for the population of interest
+			
+		Pop: POP of interest to get data for
+			Three letter string (e.g. EUR for European)
+	Returns: integer
+	"""
+	if not isinstance(Directory, str):
+		raise ValueError("Directory needs to be a String")
+	
+	if not isinstance(Pop, str):
+		raise ValueError("Pop needs to be a String")
+	
+	if not (os.path.isdir(Directory)):
+		raise ValueError("Directory not found.")
+	
+	expected_pops = ['ASW', 'TSI', 'PUR',
+ 		'CHB', 'GBR', 'EUR',
+ 		'CLM', 'AFR', 'ASN',
+		 'CHS', 'YRI', 'MXL',
+		 'JPT', 'LWK', 'FIN',
+		 'CEU', 'IBS']
+	
+	if Pop not in expected_pops:
+		raise ValueError(Pop+" not found in expected pops:\n"+str(expected_pops))
+	
+	files = os.listdir(Directory)
+	
+	n_snvs = 0
+	n_files = 0
+	for f in files:
+		if "."+Pop+".SNV" in f:
+			n_files = n_files+1
+			if n_files > 1:
+				raise ValueError("More than one file matched "+"."+Pop+".SNV in Directory.")
+			with open(file, 'rb') as file_handle:
+				content = file_handle.readlines()
+				for line in content:
+					n_snvs = n_snvs + 1
+	return n_snvs
