@@ -23,6 +23,7 @@ import sys
 import os
 # Useful for manipulating a list all at once
 from operator import methodcaller, itemgetter
+import pdb
 
 
 def get_variant_dict(Pop):
@@ -99,6 +100,7 @@ def n_variants(Directory, Pop):
 			Three letter string (e.g. EUR for European)
 	Returns: integer
 	"""
+	pdb.set_trace()
 	if not isinstance(Directory, str):
 		raise ValueError("Directory needs to be a String")
 	
@@ -127,7 +129,7 @@ def n_variants(Directory, Pop):
 			n_files = n_files+1
 			if n_files > 1:
 				raise ValueError("More than one file matched "+"."+Pop+".SNV in Directory.")
-			with open(file, 'rb') as file_handle:
+			with open(f, 'rb') as file_handle:
 				content = file_handle.readlines()
 				for line in content:
 					n_snvs = n_snvs + 1
