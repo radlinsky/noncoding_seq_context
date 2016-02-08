@@ -48,10 +48,13 @@ if not (os.path.isdir(in_DIR)):
 
 # Find all '.SNV" files in their respective sub directories
 sub_dirs = dict()
-for root, subdirs, files in os.walk(in_DIR):  
-    # Add all sub_dirs as dict keys
-    for subdir in subdirs:
-        sub_dirs[subdir] = list()
+i = 0
+for root, subdirs, files in os.walk(in_DIR): 
+    if i == 0: 
+        # Add all sub_dirs as dict keys
+        for subdir in subdirs:
+            sub_dirs[os.path.join(root,subdir)] = list()
+    i = i+1
     for f in files:
         # If .SNV file in the directory
         if ".SNV" in f:
