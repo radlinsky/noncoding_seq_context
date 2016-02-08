@@ -35,7 +35,7 @@
 ###    On Varun's get_seq_context_interval module [see file path below]
 ###
 ###  Usage:
-###    python add_seq_context_col.py input_dir/ delim chrom start end before_after
+###    python folderize_by_gene.py input_dir/ delim chrom start end before_after
 
 import sys
 import os
@@ -44,7 +44,7 @@ from operator import methodcaller, itemgetter
 varun_scripts = "/project/voight_subrate/avarun/Research/mutation_rate/scripts_for_folks"
 sys.path.append(varun_scripts)
 from find_context import get_seq_context_interval
-caleb_scripts = "/project/voight_subrate/cradens/noncoding_seq_context/script/generally_useful"
+caleb_scripts = "/project/voight_subrate/cradens/noncoding_seq_context/script/"
 sys.path.append(caleb_scripts)
 from helper_functions import remove_all
 import csv
@@ -86,7 +86,7 @@ ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 in_files = list()
 for root, subdirs, files in os.walk(in_dir):
 	for f in files:
-		if ".BED" in f and ".seq_context" not in f:
+		if ".BED" in f:
 			in_files.append(os.path.join(root,f))
 
 for full_file_name in in_files:
