@@ -2,7 +2,7 @@
 
 ### sequence_functions.py
 ### Caleb Matthew Radens
-### 2015_2_3
+### 2015_2_8
 
 ### A bunch of helpful sequence-related functions I put together.
 ###
@@ -100,7 +100,7 @@ def n_variants(Directory, Pop):
 			Three letter string (e.g. EUR for European)
 	Returns: integer
 	"""
-	pdb.set_trace()
+	#pdb.set_trace()
 	if not isinstance(Directory, str):
 		raise ValueError("Directory needs to be a String")
 	
@@ -120,15 +120,23 @@ def n_variants(Directory, Pop):
 	if Pop not in expected_pops:
 		raise ValueError(Pop+" not found in expected pops:\n"+str(expected_pops))
 	
+	# Get list of all files in directory
 	files = os.listdir(Directory)
 	
+	# Counter of SNVs
 	n_snvs = 0
+	
+	# Counter of matched files
 	n_files = 0
 	for f in files:
+		
+		# If .POP.SNV in fikle name, add it to the list of matched files
 		if "."+Pop+".SNV" in f:
 			n_files = n_files+1
 			if n_files > 1:
 				raise ValueError("More than one file matched "+"."+Pop+".SNV in Directory.")
+			
+			# Count how many lines are in the file (corresponds to # of SNVs)
 			with open(os.path.join(Directory,f), 'rb') as file_handle:
 				content = file_handle.readlines()
 				for line in content:
