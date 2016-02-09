@@ -8,7 +8,7 @@ for (pop_i in 2:length(names(table))){
   png(plot_name, width=10, height=7.5, units="in", res=200)
   zero_data=table[,pop_i][which(table[,pop_i] ==0)]
   non_zero_data=table[,pop_i][which(table[,pop_i] !=0)]
-  hist(non_zero_data,main=paste(pop," (",length(zero_data)," 0s)"))
+  hist(non_zero_data,main=paste("miRNA SNVs for",pop,"(",length(zero_data),"0s)"),xlim=c(0,10),xlab="Number of SNVs per miRNA")
   dev.off()
 }
 

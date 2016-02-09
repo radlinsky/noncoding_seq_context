@@ -52,7 +52,12 @@ for root, subdirs, files in os.walk(in_dir):
 	for f in files:
 		if ".seq_context" in f:
 			bed_files.append(os.path.join(root,f))
-	
+
+
+ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
+			"11","12","13","14","15","16","17","18",
+			"19","20","21","22","X"]
+
 for bed_file in bed_files:
 	with open(bed_file, 'rb') as in_file:
 		i = 0
@@ -79,8 +84,8 @@ for bed_file in bed_files:
 						line_to_save.append(str(loci))
 						line_to_save.extend(chrom_dict[str(loci)])
 						snv_data.append(line_to_save)
-			else:
-				raise StandardError("Chromosome '"+chrom+"' not in pop_dict.")
+			elif chrom not in ACCEPTED_CHROMOSOMES:
+				raise StandardError("Chromosome '"+chrom+"' not an accepted chromosome.")
 			i = i + 1
 		# If varaints were found, write them to file
 		if len(snv_data) != 0:

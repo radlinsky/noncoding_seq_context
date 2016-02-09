@@ -136,10 +136,10 @@ for full_file_name in in_files:
 		file_type = full_file_name[-4:]
 		out_file_path = full_file_name[:-4]+".seq_context"+file_type
 		with open(out_file_path,"wb+") as out:
-		    csv_out=csv.writer(out)
-		    csv_out.writerow(header)
-		    for row in columnized:
-			csv_out.writerow(row)
+			csv_out=csv.writer(out)
+			csv_out.writerow(header)
+			for row in columnized:
+				csv_out.writerow(row)
 			
 	else:
 		print "File: "+file_name+" had a header, but was empty."
