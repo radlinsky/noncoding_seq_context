@@ -73,6 +73,11 @@ if len(in_files) <= 0:
 if len(delim) <= 0:
 	raise ValueError("delim must be of length > 0")
 
+# from bash, >>> python \t sends a 't' to python. >>> python $'\t' sends \t.
+#    this little check assumes user meant \t
+if "t" in delim and len(delim)==1:
+	delim = "\t"
+
 if chrom_i < 0 or start_i < 0 or end_i < 0:
 	raise ValueError("Column indeces need to be an integers >= 0.")
 
