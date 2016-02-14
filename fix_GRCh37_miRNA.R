@@ -52,6 +52,8 @@ for (id in not_lost_in_maplation){
   
   id_index <- which(mirna37$V4 == id)
   mirna37$type[id_index] <- orig_type
+  
+  
   mirna37$strand[id_index] <- orig_strand
 }
 
@@ -65,6 +67,19 @@ if ("EMPTY" %in% mirna37$strand){
 fixed_mirna <- "/project/voight_subrate/cradens/noncoding_seq_context/data/results/mirbase/miRNA_GRCh37_full.BED"
 write.table(x=mirna37,
             file=fixed_mirna,
+            quote=FALSE,
+            sep="\t",
+            row.names=FALSE,
+            col.names = FALSE)
+
+# mature miRNA = "MIMA####"
+mature_mirna<- grepl("MIMA",mirna37$V4)
+# stem_loop precursors = "MI#####"
+primary_transcripts <- mirna37[!mature_mirna,]
+
+mirna_primary_transcripts <- "/project/voight_subrate/cradens/noncoding_seq_context/data/results/mirbase/miRNA_GRCh37_primary_transcripts.BED"
+write.table(x=primary_transcripts,
+            file=mirna_primary_transcripts,
             quote=FALSE,
             sep="\t",
             row.names=FALSE,
