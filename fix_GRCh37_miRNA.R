@@ -76,6 +76,9 @@ write.table(x=mirna37,
 mature_mirna<- grepl("MIMA",mirna37$V4)
 # stem_loop precursors = "MI#####"
 primary_transcripts <- mirna37[!mature_mirna,]
+ID<-matrix(unlist(strsplit(primary_transcripts$V4,";Alias=")),byrow=T,ncol=2)[,1]
+ID<-matrix(unlist(strsplit(ID,"=")),byrow=T,ncol=2)[,2]
+primary_transcripts$id<-ID
 
 mirna_primary_transcripts <- "/project/voight_subrate/cradens/noncoding_seq_context/data/results/mirbase/miRNA_GRCh37_primary_transcripts.BED"
 write.table(x=primary_transcripts,
