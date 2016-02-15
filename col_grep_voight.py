@@ -93,11 +93,12 @@ with open("cowabunga.py", 'wb') as handle:
     handle.write("col_seps = Column_index * (\".*\"+delim)\n")
     handle.write("for f in files:\n")
     handle.write("\tif folderize =='n_fold':\n")
-    handle.write("\t\tout_FILE = os.path.join(out_DIR, f)\n")
+    handle.write("\t\tnew_out_FILE = os.path.join(out_DIR, f)\n")
     handle.write("\tif folderize =='y_fold':\n")
-    handle.write("\t\tout_DIR = os.path.join(out_DIR, f)\n")
-    handle.write("\t\tout_FILE = os.path.join(out_DIR, f)\n")
-    handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+out_FILE],shell=True)")
+    handle.write("\t\tnew_out_DIR = os.path.join(out_DIR, f)\n")
+    handle.write("\t\tos.makedirs(new_out_DIR)\n")
+    handle.write("\t\tnew_out_FILE = os.path.join(new_out_DIR, f)\n")
+    handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+new_out_FILE],shell=True)")
 
 
 # Convert delim to '\t' if it is tab
