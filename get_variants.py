@@ -59,7 +59,7 @@ for root, subdirs, files in os.walk(in_dir):
 ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
 			"19","20","21","22"]
-pdb.set_trace()
+
 for bed_file in bed_files:
 	with open(bed_file, 'rb') as in_file:
 		i = 0
@@ -97,16 +97,16 @@ for bed_file in bed_files:
 						line_to_save.append(str(loci))
 						line_to_save.extend(chrom_dict[str(loci)])
 						snv_data.append(line_to_save)
-
+						
+			# If varaints were found, write them to file
+			if len(snv_data) != 0:
+				directory = os.path.dirname(bed_file)
+				new_file = os.path.join(directory,
+							os.path.basename(directory)+"."+pop+".SNV")
+				with open(new_file, 'wb+') as out_file:
+					writer = csv.writer(out_file)
+					writer.writerows(snv_data)
+				print str(len(snv_data))+" variants found in file:\n"+bed_file
+			else:
+				print "No variants found in file:\n"+bed_file
 			i = i + 1
-		# If varaints were found, write them to file
-		if len(snv_data) != 0:
-			directory = os.path.dirname(bed_file)
-			new_file = os.path.join(directory,
-						os.path.basename(directory)+"."+pop+".SNV")
-			with open(new_file, 'wb+') as out_file:
-				writer = csv.writer(out_file)
-				writer.writerows(snv_data)
-			print str(len(snv_data))+" variants found in file:\n"+bed_file
-		else:
-			print "No variants found in file:\n"+bed_file
