@@ -93,9 +93,6 @@ ACCEPTED_CHROMOSOMES = list()
 ACCEPTED_CHROMOSOMES.extend(["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
 			"19","20","21","22"])
-ACCEPTED_CHROMOSOMES.extend(["chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10",
-			"chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18",
-			"chr19","chr20","chr21","chr22"])
 
 in_files = list()
 for root, subdirs, files in os.walk(in_dir):
@@ -123,6 +120,8 @@ for full_file_name in in_files:
 			# Add line to all_lines
 			split_line = line.rstrip('\r\n').split(delim)
 			chrom = split_line[chrom_i]
+			# Extract # from chromosome. Expected format: 'chr#' or '#'
+			chrom = [int(s) for s in chrom.split("chr") if s.isdigit()]
 			if chrom not in ACCEPTED_CHROMOSOMES:
 				print "'"+chrom+"' isn't an accepted chromosome at line # "+str(i)+" in file: "+file_name
 				i+=1
