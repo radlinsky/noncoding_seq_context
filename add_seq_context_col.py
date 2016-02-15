@@ -2,11 +2,11 @@
 
 ### add_seq_context_col.py
 ### Caleb Matthew Radens
-### 2015_2_2
+### 2015_2_15
 
-### This script appends a column of hg19 reference genome sequence to all .BED files in a folder
-### 	that have chr, start, and end positions as columns. Discards all other columns. Output
-###	is saved as a new file with '.seq_context' appended to the root file name.
+###	This script appends a column of hg19 reference genome sequence to all .BED files in a folder
+###		that have chr, start, and end positions as columns. Discards all other columns. Output
+###		is saved as a new file with '.seq_context' appended to the root file name.
 ###
 ### 	Arguments:
 ###			input_directory/: where are the files located? 
@@ -27,6 +27,8 @@
 ###		Assumptions:
 ###			All files are structured and deliminated identically
 ###			All files end in '.BED'
+###			chromosome format: (# = 1:23)
+###				'chr#' or '#'
 ###  
 ###		Notes:
 ###			Any row with a non-acceptable chromosome (only 1:23, X/Y rejected) will be skipped
@@ -87,9 +89,13 @@ if chrom_i < 0 or start_i < 0 or end_i < 0:
 if padding < 0:
 	raise ValueError("Padding needs to be an integer >0")
 
-ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
+ACCEPTED_CHROMOSOMES = list()
+ACCEPTED_CHROMOSOMES.extend(["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
-			"19","20","21","22"]
+			"19","20","21","22"])
+ACCEPTED_CHROMOSOMES.extend(["chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10",
+			"chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18",
+			"chr19","chr20","chr21","chr22"])
 
 in_files = list()
 for root, subdirs, files in os.walk(in_dir):
