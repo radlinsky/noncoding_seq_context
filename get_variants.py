@@ -60,17 +60,14 @@ ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
 			"19","20","21","22"]
 
-pdb.set_trace()
+#pdb.set_trace()
 
 for bed_file in bed_files:
 	with open(bed_file, 'rb') as in_file:
 		i = 0
 		snv_data = list()
 		for line in in_file:
-			# Skip header
-			if i == 0:
-				i = i + 1
-				continue
+
 			# Split line at ','
 			line = line.split(",")
 			chrom = line[0]
