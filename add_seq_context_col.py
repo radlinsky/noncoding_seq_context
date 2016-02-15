@@ -125,8 +125,11 @@ for full_file_name in in_files:
 			chrom = [str(s) for s in chrom.split("chr") if s.isdigit()]
 			if len(chrom) > 1:
 				raise ValueError("Unexpected chromosome format: "+split_line[chrom_i])
-			chrom = chrom[0]
-			if chrom[0] not in ACCEPTED_CHROMOSOMES:
+			if len(chrom) == 0:
+				chrom = split_line[chrom_i]
+			if len(chrom) == 1:
+				chrom = chrom[0]
+			if chrom not in ACCEPTED_CHROMOSOMES:
 				print "'"+chrom+"' isn't an accepted chromosome at line # "+str(i)+" in file: "+file_name
 				i+=1
 				continue
