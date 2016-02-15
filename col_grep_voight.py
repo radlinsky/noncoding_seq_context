@@ -30,7 +30,7 @@
 ###        ***The col of interest doesn't have something unix/bash-interpretable in it***
 ###        You're using a LSF job schedule and the following bash command looks familiar:
 ###            > bsub -e error.err -o out.out python my_fav_script.py
-###        The out_DIR exists and is EMPTY 
+###        The out_DIR exists and is *EMPTY*
 ###
 ###    Usage:
 ###        python grep_col.py in_file.txt delim skip Column_# out_DIR folderize
