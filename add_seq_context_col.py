@@ -27,7 +27,7 @@
 ###		Assumptions:
 ###			All files are structured and deliminated identically
 ###			All files end in '.BED'
-###			chromosome format: (# = 1:23)
+###			chromosome format: (# = 1:23) if # == 'X' or 'Y', line is ignored.
 ###				'chr#' or '#'
 ###  
 ###		Notes:
@@ -120,9 +120,13 @@ for full_file_name in in_files:
 			# Add line to all_lines
 			split_line = line.rstrip('\r\n').split(delim)
 			chrom = split_line[chrom_i]
+			
 			# Extract # from chromosome. Expected format: 'chr#' or '#'
-			chrom = [int(s) for s in chrom.split("chr") if s.isdigit()]
-			if chrom not in ACCEPTED_CHROMOSOMES:
+			chrom = [str(s) for s in chrom.split("chr") if s.isdigit()]
+			if len(chrom) > 1:
+				raise ValueError("Unexpected chromosome format: "+split_line[chrom_i])
+			chrom = chrom[0]
+			if chrom[0] not in ACCEPTED_CHROMOSOMES:
 				print "'"+chrom+"' isn't an accepted chromosome at line # "+str(i)+" in file: "+file_name
 				i+=1
 				continue
