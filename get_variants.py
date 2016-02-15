@@ -32,7 +32,7 @@ home_base = "/project/voight_subrate/cradens/noncoding_seq_context/"
 sys.path.append(home_base+"script/")
 from sequence_functions import get_variant_dict
 
-pdb.set_trace()
+
 
 print "Initiating get_variants.py"
 print "Argument List:", str(sys.argv[1:])
@@ -59,7 +59,7 @@ for root, subdirs, files in os.walk(in_dir):
 ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
 			"19","20","21","22"]
-
+pdb.set_trace()
 for bed_file in bed_files:
 	with open(bed_file, 'rb') as in_file:
 		i = 0
