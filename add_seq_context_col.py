@@ -8,58 +8,58 @@
 ### 	that have chr, start, and end positions as columns. Discards all other columns. Output
 ###	is saved as a new file with '.seq_context' appended to the root file name.
 ###
-###  Arguments:
-###	input_directory/: where are the files located? 
-###	 extant, non-empty directory
-###	delim: what are the file deliminators? (default: ,)
-###	 string
-###	chrom: which column is the chromosome column?
-###	 integer, valid column index
-###	start: which column is the start position column?
-###	 integer, valid column index
-###	end: which column is the end position column?
-###	 integer, valid column index
-###	before_after: nucleotides before or after the start/end (needed for padding)
-###	 integer, >=0
+### 	Arguments:
+###			input_directory/: where are the files located? 
+###				extant, non-empty directory
+###			delim: what are the file deliminators? (default: ,)
+###				string
+###			skip: how many lines to skip before looking for genomic loci info?
+###				integer >= 0
+###			chrom: which column is the chromosome column?
+###				integer, valid column index
+###			start: which column is the start position column?
+###				integer, valid column index
+###			end: which column is the end position column?
+###				integer, valid column index
+###			before_after: nucleotides before or after the start/end (needed for padding)
+###				integer, >=0
 ###
-###  Assumptions:
-###    All files are structured and deliminated identically
-###    There are single line headers for each file
-###    Files end in '.txt' or '.csv' or anything of the format '.NNN'
+###		Assumptions:
+###			All files are structured and deliminated identically
+###			All files end in '.BED'
 ###  
-###  Notes:
-###    Any row with a non-acceptable chromosome (1:23 and X) will be skipped: NA instead of sequence
-###    Recursively gets all files in directory that contain '.BED' but lack '.seq_context'
+###		Notes:
+###			Any row with a non-acceptable chromosome (only 1:23, X/Y rejected) will be skipped
+###			Only writes to file if there is an acceptable chromosome
+###			Recursively gets all files in directory that contain '.BED' but lack '.seq_context'
 ###
-###  Depends:
-###    On Varun's get_seq_context_interval module [see file path below]
+###		Depends:
+###			On Varun's get_seq_context_interval module [see file path below]
 ###
-###  Usage:
-###    python add_seq_context_col.py input_dir/ delim chrom start end before_after
+###		Usage:
+###			python add_seq_context_col.py input_dir/ delim skip chrom start end before_after
 
 import sys
 import os
-# Useful for manipulating a list all at once
-from operator import methodcaller, itemgetter
 varun_scripts = "/project/voight_subrate/avarun/Research/mutation_rate/scripts_for_folks"
 sys.path.append(varun_scripts)
 from find_context import get_seq_context_interval
 caleb_scripts = "/project/voight_subrate/cradens/noncoding_seq_context/script/generally_useful"
 sys.path.append(caleb_scripts)
-from helper_functions import remove_all
 import csv
 
 print "Initiating add_seq_context_col.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 6):
-	raise Exception("Expected five command arguments.")
+if (len(sys.argv)-1 != 7):
+	raise Exception("Expected seven command arguments.")
 in_dir = str(sys.argv[1])
 delim = str(sys.argv[2])
-chrom_i = int(sys.argv[3])
-start_i = int(sys.argv[4])
-end_i = int(sys.argv[5])
-padding = int(sys.argv[6])
+skip = int(sys.argv[3])
+chrom_i = int(sys.argv[4])
+start_i = int(sys.argv[5])
+end_i = int(sys.argv[6])
+padding = int(sys.argv[7])
 
 if not (os.path.isdir(in_dir)):
 	raise ValueError(in_dir+" not found. Is it a valid directory?")
@@ -71,7 +71,10 @@ if len(in_files) <= 0:
 	raise Exception("No files or folders found in directory.")
 
 if len(delim) <= 0:
-	raise ValueError("delim must be of length > 0")
+	raise ValueError("delim must be of length > 0.")
+
+if skip < 0:
+	raise ValueError("skip needs to be integer >= 0.")
 
 # from bash, >>> python \t sends a 't' to python. >>> python $'\t' sends \t.
 #    this little check assumes user meant \t
@@ -86,94 +89,62 @@ if padding < 0:
 
 ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
-			"19","20","21","22","X"]
+			"19","20","21","22"]
 
 in_files = list()
 for root, subdirs, files in os.walk(in_dir):
 	for f in files:
 		if ".BED" in f and ".seq_context" not in f:
 			in_files.append(os.path.join(root,f))
-
+			
+all_seq_context_files = list()
+skipped_files = list()
 for full_file_name in in_files:
+	new_lines = list()
 	# Get base of full_file_name
 	file_name = os.path.basename(full_file_name)
 	# Open file for reading in binary format
 	with open(full_file_name, 'rb') as file_handle:
-		# Get all lines, removed of \n, from the file, as a list
-		all_lines = file_handle.read().splitlines()
-		# Use operator.itemgetter() to slit each line in the list at delim
-		all_lines = map(methodcaller("split", delim), all_lines)
-	# Pop the header from the list of lines
-	orig_header = all_lines.pop(0)
-	cols_to_keep = [chrom_i, start_i, end_i]
-	# Sort cols to keep, lowest to highest
-	cols_to_keep.sort(reverse=True)
-	# Build new header, using original header names, maintaining order:
-	header = list()
-	for i in cols_to_keep:
-		header.insert(0,orig_header.pop(i))
-	# Add new column to header
-	header.append("sequence_context_interval")
-	if len(all_lines) > 0:
-		# Use operator.itemgetter() to get all index-specified elements from list of lines
-		chroms = map(itemgetter(chrom_i), all_lines)
-		starts = map(itemgetter(start_i), all_lines)
-		ends = map(itemgetter(end_i), all_lines)
-		sequences = list()
-		# Add the sequence conext interval for each chr, start, end in file
-		for chrom, start, end in zip(chroms, starts, ends):
-			if chrom not in ACCEPTED_CHROMOSOMES:
-				print "'"+chrom+"' isn't a valid chrom in file: "+file_name
-				sequences.append("NA")
-			else:
-				sequences.append(get_seq_context_interval(chrom,start,end,padding))
-
-		# Check if 'NA' is the only type of sequence data in the file (if so, skip it)
-		sequences_list = list(sequences)
-		remove_all(sequences_list,"NA")
-		if len(sequences_list) == 0:
-			print "Skipping: "+file_name+" because no valid chromosomes were in it."
-			continue
-
-		columnized = zip(chroms, starts, ends, sequences)
-
-		# Add '.seq_context' before the filetype and write to file
-		file_type = full_file_name[-4:]
-		out_file_path = full_file_name[:-4]+".seq_context"+file_type
-		with open(out_file_path,"wb+") as out:
-			csv_out=csv.writer(out)
-			csv_out.writerow(header)
-			for row in columnized:
-				csv_out.writerow(row)
+		# Skip lines
+		i = 0
+		for line in file_handle:
+			if i < skip:
+				i+=1
+				continue
 			
-	else:
-		print "File: "+file_name+" had a header, but was empty."
-
+			if delim not in line:
+				raise ValueError("Delim '"+delim+"' not found in line # "+str(i))
+			# Add line to all_lines
+			split_line = line.rstrip('\r\n').split(delim)
+			chrom = split_line[chrom_i]
+			if chrom not in ACCEPTED_CHROMOSOMES:
+				print "'"+chrom+"' isn't an accepted chromosome at line # "+str(i)+" in file: "+file_name
+				i+=1
+				continue
+			start = split_line[start_i]
+			end = split_line[end_i]
+			if start >= end:
+				raise ValueError("Start is >= End at line # "+str(i))
+			sequence = get_seq_context_interval(chrom,start,end,padding)
+			split_line.append(sequence)
+			new_lines.append(split_line)
+			i+=1
+	if len(new_lines) == 0:
+		print "Skipping file "+file_name+" because it didn't have any accepted chromosomes."
+		skipped_files.append(full_file_name)
+		continue
 	
+	# Add '.seq_context' before '.BED' and write to file
+	new_file_name = full_file_name[:-4]+".seq_context"+full_file_name[-4:]
+	with open(new_file_name,"wb+") as out:
+		csv_out=csv.writer(out)
+		csv_out.writerows(new_lines)
+	all_seq_context_files.append(new_file_name)
+	
+print "=============="
+print "Retrieved sequence context from "+str(len(all_seq_context_files))+" .BED files."
+print "New files written:\n"+str(all_seq_context_files)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+print "=============="
+print "Skipped "+ str(len(skipped_files)) + " files because they didn't have acceptable chromosome names."
+print "Skipped files were:\n"+str(skipped_files)
