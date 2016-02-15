@@ -32,6 +32,8 @@ home_base = "/project/voight_subrate/cradens/noncoding_seq_context/"
 sys.path.append(home_base+"script/")
 from sequence_functions import get_variant_dict
 
+pdb.set_trace()
+
 print "Initiating get_variants.py"
 print "Argument List:", str(sys.argv[1:])
 
