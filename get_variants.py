@@ -2,7 +2,7 @@
 
 ### get_variants.py
 ### Caleb Matthew Radens
-### 2015_2_5
+### 2015_2_15
 
 ### Get SNV info from a given region of the genome from a user-specified population.
 ###
@@ -56,7 +56,7 @@ for root, subdirs, files in os.walk(in_dir):
 
 ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
-			"19","20","21","22","X"]
+			"19","20","21","22"]
 
 for bed_file in bed_files:
 	with open(bed_file, 'rb') as in_file:
@@ -70,6 +70,17 @@ for bed_file in bed_files:
 			# Split line at ','
 			line = line.split(",")
 			chrom = line[0]
+			
+			# Extract # from chromosome. Expected format: 'chr#' or '#'
+			chrom = [str(s) for s in chrom.split("chr") if s.isdigit()]
+			if len(chrom) > 1:
+				raise ValueError("Unexpected chromosome format: "+line[0])
+			elif len(chrom) == 0:
+				chrom = line[0]
+			elif len(chrom) == 1:
+				chrom = chrom[0]
+			if chrom not in ACCEPTED_CHROMOSOMES:
+				raise StandardError("Chromosome '"+chrom+"' not an accepted chromosome.")
 			start = line[1]
 			end = line[2]
 			# If the dictionary has key == chromosome of interest
@@ -84,8 +95,7 @@ for bed_file in bed_files:
 						line_to_save.append(str(loci))
 						line_to_save.extend(chrom_dict[str(loci)])
 						snv_data.append(line_to_save)
-			elif chrom not in ACCEPTED_CHROMOSOMES:
-				raise StandardError("Chromosome '"+chrom+"' not an accepted chromosome.")
+
 			i = i + 1
 		# If varaints were found, write them to file
 		if len(snv_data) != 0:
