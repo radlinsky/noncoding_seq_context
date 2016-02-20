@@ -118,7 +118,7 @@ with open("never_gonna_give_u_up.py", 'wb') as handle:
     handle.write("parent_dir_base = os.path.basename(in_DIR)\n")
     handle.write("new_file_path = os.path.join(in_DIR, parent_dir_base+'_'+Pop+'_1000_sim')\n")
     handle.write("find_simulated_variants(fastaseq = fasta, pop = Pop, filesave = new_file_path, nsim = 1000)\n")
-    handle.write("parent_sqrd = os.path.dirname(parent_dir_base)\n")
+    handle.write("parent_sqrd = os.path.dirname(in_DIR)\n")
     handle.write("finish_file = os.path.join(parent_sqrd,parent_dir_base+'_never_gonna_give_u_up_parent_dir_base_FINISHED')\n")
     handle.write("with open(finish_file, 'wb'):\n")
     handle.write("\tpass\n")
@@ -140,7 +140,8 @@ all_done = False
 # Wait until all the simulations have been run
 while not all_done:
     finish_files = list()
-    for f in os.listdir(parent_sqrd):
+    current_files = os.listdir(parent_sqrd)
+    for f in current_files:
         if "_never_gonna_give_u_up_parent_dir_base_FINISHED" in f:
             finish_files.append(os.path.join(parent_sqrd, f))
     if len(finish_files) == n_files:
