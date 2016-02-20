@@ -87,9 +87,10 @@ if col < 0:
     raise ValueError("col needs to be an integer >= 0.")
 
 # Sub-routine
-if os.path.isfile("never_gonna_give_u_up.py"):
-    print "FYI, we're overwriting something called 'never_gonna_give_u_up.py'"
-with open("never_gonna_give_u_up.py", 'wb') as handle:
+sub_routine = POP+"_never_gonna_give_u_up.py"
+if os.path.isfile(sub_routine):
+    print "FYI, we're overwriting something called "+sub_routine
+with open(sub_routine, 'wb') as handle:
     handle.write("#!/usr/bin/python\n")
     handle.write("import sys, os, pdb\nfrom subprocess import call\n")
     handle.write("home_base = '/project/voight_subrate/cradens/noncoding_seq_context/script/'\n")
@@ -119,7 +120,7 @@ with open("never_gonna_give_u_up.py", 'wb') as handle:
     handle.write("new_file_path = os.path.join(in_DIR, parent_dir_base+'_'+Pop+'_1000_sim')\n")
     handle.write("find_simulated_variants(fastaseq = fasta, pop = Pop, filesave = new_file_path, nsim = 1000)\n")
     handle.write("parent_sqrd = os.path.dirname(in_DIR)\n")
-    handle.write("finish_file = os.path.join(parent_sqrd,parent_dir_base+'_never_gonna_give_u_up_parent_dir_base_FINISHED')\n")
+    handle.write("finish_file = os.path.join(parent_sqrd,parent_dir_base+'_'+Pop+'_never_gonna_give_u_up_parent_dir_base_FINISHED')\n")
     handle.write("with open(finish_file, 'wb'):\n")
     handle.write("\tpass\n")
     
@@ -129,8 +130,9 @@ n_files = len(files)
 
 for f in files:
     parent_dir_path = os.path.dirname(f)
-    command = "bsub -e never_gonna_give_u_up.err -o never_gonna_give_u_up.out -q voight_normal "
-    command += "python never_gonna_give_u_up.py "+parent_dir_path+" "+delim+" "+str(col)+" "+POP
+    command = "bsub -e "+sub_routine[:-3]+".err "
+    command += "-o "+sub_routine[:-3]+".out -q voight_normal "
+    command += "python "+sub_routine+" "+parent_dir_path+" "+delim+" "+str(col)+" "+POP
     proc = Popen([command],shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 
 #pdb.set_trace()
@@ -142,7 +144,7 @@ while not all_done:
     finish_files = list()
     current_files = os.listdir(parent_sqrd)
     for f in current_files:
-        if "_never_gonna_give_u_up_parent_dir_base_FINISHED" in f:
+        if POP+"_never_gonna_give_u_up_parent_dir_base_FINISHED" in f:
             finish_files.append(os.path.join(parent_sqrd, f))
     if len(finish_files) == n_files:
         all_done = True
@@ -156,16 +158,16 @@ for f in finish_files:
 
 coverage = 0
 print "=============="
-print "never_gonna_give_u_up.err looks like:"
-with open("never_gonna_give_u_up.err") as handle:
+print "error file looks like:"
+with open(sub_routine[:-3]+".err") as handle:
     for line in handle:
         print line.rstrip("\n\r")
         
 #pdb.set_trace()
 
 print "=============="
-print "never_gonna_give_u_up.out looks like:"
-with open("never_gonna_give_u_up.out") as handle:
+print "out file looks like:"
+with open(sub_routine[:-3]+".out") as handle:
     for line in handle:
         # Extract coverage info from .out file
         if "never_gonna_give_u_up_coverage:" in line:
@@ -175,13 +177,13 @@ with open("never_gonna_give_u_up.out") as handle:
 #pdb.set_trace()
 
 # Remove sub-routine and the error / out files
-os.remove("never_gonna_give_u_up.py")
-os.remove("never_gonna_give_u_up.err")
-os.remove("never_gonna_give_u_up.out")
+os.remove(sub_routine)
+os.remove(sub_routine[:-3]+".err")
+os.remove(sub_routine[:-3]+".out")
         
 print "Finished recursive_simulator.py"
 print "Number of seq_context.BED files found: "+str(len(files))
-print "Total coverage of all fasta sequences:"
+print "Total coverage of all fasta sequences for population '"+POP+"':"
 print "Bp: "+str(coverage)
 print "Kb: "+str(float(coverage)/1000.0)
 print "Mb: "+str(float(coverage)/1000000.0)
