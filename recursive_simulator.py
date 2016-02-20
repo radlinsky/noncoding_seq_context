@@ -95,7 +95,7 @@ with open("never_gonna_give_u_up.py", 'wb') as handle:
     handle.write("delim = str(sys.argv[2])\n")
     handle.write("if delim == 'tab':\n\tdelim='\t'\n")
     handle.write("Column_index = int(sys.argv[3])\n")
-    handle.write("Pop = int(sys.argv[4])\n")
+    handle.write("Pop = str(sys.argv[4])\n")
     handle.write("fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index)\n")
     handle.write("if len(fasta) == 0:\n")
     handle.write("\traise ValueError('Fasta sequence not found in directory: '+in_DIR)\n")
