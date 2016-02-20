@@ -360,7 +360,9 @@ def get_seq_context(Directory, Delim, Col):
 			if delim not in line:
 				raise ValueError("You fool! The seq context file wasn't delimited by: '"+delim+"'!")
 			
-			fasta = line[Col]
+			split_line = line.rstrip("\n\r").split(delim)
+			
+			fasta = split_line[Col]
 			
 			line_count += 1
 			
