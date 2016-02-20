@@ -294,7 +294,7 @@ def get_seq_context_files(Directory):
 		raise ValueError(Directory +" is not a valid Directory.")
 	
 	matched_files = list()
-	matched_subdirs = dict()
+	matched_subdirs = set()
 	
 	for root, subdirs, files in os.walk(Directory):
 		for f in files:
