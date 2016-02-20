@@ -346,7 +346,7 @@ def get_seq_context(Directory, Delim, Col):
 	
 	for f in files:
 		if ".seq_context.BED" in f:
-			matched.append(f)
+			matched.append(os.path.join(Directory,f))
 			
 	if len(matched) == 0:
 		raise BaseException("No 'seq_context.BED files found in directory: "+Directory)
