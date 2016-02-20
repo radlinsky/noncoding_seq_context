@@ -341,7 +341,7 @@ def get_seq_context(Directory, Delim, Col):
 	if not isinstance(Col, int) or Col < 0:
 		raise ValueError("Col needs to be an integer >= 0.")
 	
-	files = os.listdir()
+	files = os.listdir(Directory)
 	matched = list()
 	
 	for f in files:
