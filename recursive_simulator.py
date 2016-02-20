@@ -107,7 +107,7 @@ with open("never_gonna_give_u_up.py", 'wb') as handle:
     handle.write("G = fasta.count('G')\n")
     handle.write("if A+T+C+G != len(fasta):\n")
     handle.write("\traise ValueError('Fasta sequence had characters other than A, T, C, and G in dir: '+in_DIR)\n")
-    handle.write("print 'never_gonna_give_u_up_coverage:'+str(len(fasta))")
+    handle.write("print 'never_gonna_give_u_up_coverage:'+str(len(fasta))\n")
     handle.write("parent_dir_base = os.path.basename(in_DIR)\n")
     handle.write("new_file_path = os.path.join(in_DIR, parent_dir_base+'_'+Pop+'_1000_sim')\n")
     handle.write("find_simulated_variants(fastaseq = fasta, pop = Pop, filesave = new_file_path, nsim = 1000)")
