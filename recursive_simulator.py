@@ -128,12 +128,18 @@ for f in files:
     command += "python never_gonna_give_u_up.py "+parent_dir_path+" "+delim+" "+str(col)+" "+POP
     proc = Popen([command],shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 
+pdb.set_trace()
+
+
 coverage = 0
 print "=============="
 print "never_gonna_give_u_up.err looks like:"
 with open("never_gonna_give_u_up.err") as handle:
     for line in handle:
         print line.rstrip("\n\r")
+        
+pdb.set_trace()
+
 print "=============="
 print "never_gonna_give_u_up.out looks like:"
 with open("never_gonna_give_u_up.out") as handle:
@@ -141,7 +147,9 @@ with open("never_gonna_give_u_up.out") as handle:
         if "never_gonna_give_u_up_coverage:" in line:
             coverage+=int(line.rstrip("\n\r")[len("never_gonna_give_u_up_coverage:"):])
         print line.rstrip("\n\r")
-        
+
+pdb.set_trace()
+
 # Remove sub-routine and the error / out files
 os.remove("never_gonna_give_u_up.py")
 os.remove("never_gonna_give_u_up.err")
