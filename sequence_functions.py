@@ -302,7 +302,7 @@ def get_seq_context_files(Directory):
 				if root in matched_subdirs:
 					raise BaseException("More than one .seq_context.BED found in directory:\n"+root)
 				matched_files.append(os.path.join(root,f))
-				matched_subdirs.append(root)
+				matched_subdirs.add(root)
 				
 	return matched_files
 	
