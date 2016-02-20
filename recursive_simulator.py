@@ -91,6 +91,12 @@ if os.path.isfile("never_gonna_give_u_up.py"):
 with open("never_gonna_give_u_up.py", 'wb') as handle:
     handle.write("#!/usr/bin/python\n")
     handle.write("import sys, os, pdb\nfrom subprocess import call\n")
+    handle.write("home_base = '/project/voight_subrate/cradens/noncoding_seq_context/script/'\n")
+    handle.write("sys.path.append(home_base)\n")
+    handle.write("from sequence_functions import *\n")
+    handle.write("varun_scripts = '/project/voight_subrate/avarun/Research/mutation_rate/scripts_for_folks'\n")
+    handle.write("sys.path.append(varun_scripts)\n")
+    handle.write("from find_simulated_variants import *\n")
     handle.write("in_DIR = str(sys.argv[1])\n")
     handle.write("delim = str(sys.argv[2])\n")
     handle.write("if delim == 'tab':\n\tdelim='\t'\n")
