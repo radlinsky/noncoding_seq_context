@@ -30,7 +30,7 @@
 ###        There is a single fasta sequence in each *.seq_context.BED file
 ###
 ###  Usage:
-###    python recursive_simulator.py in_dir POP delim skip
+###    python recursive_simulator.py in_dir POP delim skip col
 
 import sys
 #import pdb
@@ -45,7 +45,7 @@ varun_scripts = "/project/voight_subrate/avarun/Research/mutation_rate/scripts_f
 sys.path.append(varun_scripts)
 from find_simulated_variants import *
 
-#pdb.set_trace()
+pdb.set_trace()
 
 print "Initiating recursive_simulator.py"
 print "Argument List:", str(sys.argv[1:])
