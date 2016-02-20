@@ -87,7 +87,7 @@ if col < 0:
     raise ValueError("col needs to be an integer >= 0.")
 
 # Sub-routine
-sub_routine = POP+"_never_gonna_give_u_up.py"
+sub_routine = os.path.join(in_DIR,POP+"_never_gonna_give_u_up.py")
 if os.path.isfile(sub_routine):
     print "FYI, we're overwriting something called "+sub_routine
 with open(sub_routine, 'wb') as handle:
@@ -115,7 +115,6 @@ with open(sub_routine, 'wb') as handle:
     handle.write("G = fasta.count('G')\n")
     handle.write("if A+T+C+G != len(fasta):\n")
     handle.write("\traise ValueError('Fasta sequence had characters other than A, T, C, and G in dir: '+in_DIR)\n")
-    handle.write("print 'never_gonna_give_u_up_coverage:'+str(len(fasta))\n")
     handle.write("parent_dir_base = os.path.basename(in_DIR)\n")
     handle.write("new_file_path = os.path.join(in_DIR, parent_dir_base+'_'+Pop+'_1000_sim')\n")
     handle.write("find_simulated_variants(fastaseq = fasta, pop = Pop, filesave = new_file_path, nsim = 1000)\n")
@@ -137,15 +136,14 @@ for f in files:
 
 #pdb.set_trace()
 
-parent_sqrd = os.path.dirname(parent_dir_path)
 all_done = False
 # Wait until all the simulations have been run
 while not all_done:
     finish_files = list()
-    current_files = os.listdir(parent_sqrd)
+    current_files = os.listdir(in_DIR)
     for f in current_files:
         if POP+"_never_gonna_give_u_up_FINISHED" in f:
-            finish_files.append(os.path.join(parent_sqrd, f))
+            finish_files.append(os.path.join(in_DIR, f))
     if len(finish_files) == n_files:
         all_done = True
     else:
@@ -169,9 +167,6 @@ print "=============="
 print "out file looks like:"
 with open(sub_routine[:-3]+".out") as handle:
     for line in handle:
-        # Extract coverage info from .out file
-        if "never_gonna_give_u_up_coverage:" in line:
-            coverage+=int(line.rstrip("\n\r")[len("never_gonna_give_u_up_coverage:"):])
         print line.rstrip("\n\r")
 
 #pdb.set_trace()
@@ -183,7 +178,3 @@ os.remove(sub_routine[:-3]+".out")
         
 print "Finished recursive_simulator.py"
 print "Number of seq_context.BED files found: "+str(len(files))
-print "Total coverage of all fasta sequences for population '"+POP+"':"
-print "Bp: "+str(coverage)
-print "Kb: "+str(float(coverage)/1000.0)
-print "Mb: "+str(float(coverage)/1000000.0)
