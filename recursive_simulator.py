@@ -29,11 +29,16 @@
 ###        There is a single *.seq_context.BED per sub-directory
 ###        There is a single fasta sequence in each *.seq_context.BED file
 ###
+###    Note:
+###        About the name, I was going to make this a recursive script, but I changed my
+###            mind halfway through making it recursive. I'm too lazy to change the name. 
+###
 ###  Usage:
 ###    python recursive_simulator.py in_dir POP delim skip col
 
 import sys
-#import pdb
+from subprocess import Popen
+import pdb
 
 home_base = "/project/voight_subrate/cradens/noncoding_seq_context/script/"
 # Add Caleb's script directory to PATH
@@ -80,40 +85,61 @@ col = int(col)
 if col < 0:
     raise ValueError("col needs to be an integer >= 0.")
 
-files = get_seq_context_files(Directory = in_DIR)
-coverage = 0
-percent_complete = 0
-n_files = float(len(files))
+# Sub-routine
+if os.path.isfile("never_gonna_give_u_up.py"):
+    print "FYI, we're overwriting something called 'never_gonna_give_u_up.py'"
+with open("never_gonna_give_u_up.py", 'wb') as handle:
+    handle.write("#!/usr/bin/python\n")
+    handle.write("import sys, os, pdb\nfrom subprocess import call\n")
+    handle.write("in_DIR = str(sys.argv[1])\n")
+    handle.write("delim = str(sys.argv[2])\n")
+    handle.write("if delim == 'tab':\n\tdelim='\t'\n")
+    handle.write("Column_index = int(sys.argv[3])\n")
+    handle.write("Pop = int(sys.argv[4])\n")
+    handle.write("fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index)\n")
+    handle.write("if len(fasta) == 0:\n")
+    handle.write("\traise ValueError('Fasta sequence not found in directory: '+in_DIR)\n")
+    handle.write("if fasta == 'NA':\n")
+    handle.write("\traise ValueError('Fasta sequence was NA in directory: '+in_DIR)\n")
+    handle.write("A = fasta.count('A')\n")
+    handle.write("T = fasta.count('T')\n")
+    handle.write("C = fasta.count('C')\n")
+    handle.write("G = fasta.count('G')\n")
+    handle.write("if A+T+C+G != len(fasta):\n")
+    handle.write("\traise ValueError('Fasta sequence had characters other than A, T, C, and G in dir: '+in_DIR)\n")
+    handle.write("print 'never_gonna_give_u_up_coverage:'+str(len(fasta))")
+    handle.write("parent_dir_base = os.path.basename(in_DIR)\n")
+    handle.write("new_file_path = os.path.join(in_DIR, parent_dir_base+'_'+Pop+'_1000_sim')\n")
+    handle.write("find_simulated_variants(fastaseq = fasta, pop = Pop, filesave = new_file_path, nsim = 1000)")
+    
 
-i = 0.0
+files = get_seq_context_files(Directory = in_DIR)
+n_files = len(files)
 
 for f in files:
     parent_dir_path = os.path.dirname(f)
-    
-    fasta = get_seq_context(Directory = parent_dir_path, Delim = delim, Col = col)
-    if len(fasta) == 0:
-        raise ValueError("Fasta sequence non-existent in file:\n"+f)
-    if fasta == "NA":
-        raise ValueError("Fasta sequence was 'NA' in file:\n"+f)
-    A = fasta.count("A")
-    T = fasta.count("T")
-    C = fasta.count("C")
-    G = fasta.count("G")
-    if A+T+C+G != len(fasta):
-        raise ValueError("Fasta sequence had characters other than A, T, C, and G in file:\n"+f)
-    
-    coverage += len(fasta)
-    
-    
-    parent_dir_base = os.path.basename(parent_dir_path)
-    new_file_path = os.path.join(parent_dir_path, parent_dir_base+"_"+POP+"_1000_sim")
-    try:
-        find_simulated_variants(fastaseq = fasta, pop = POP, filesave = new_file_path, nsim = 1000)
-    except:
-        print "Error caught when trying to use 'find_simulated_variants' .. initiating pdb.set_trace()"
-        pdb.set_trace()
-    i+=1
-    print "Percent complete: "+str(int((i/n_files)*100.0))
+    command = "bsub -e never_gonna_give_u_up.err -o never_gonna_give_u_up.out -q voight_normal "
+    command += "python never_gonna_give_u_up.py "+parent_dir_path+" "+delim+" "+str(col)+" "+POP
+    proc = Popen([command],shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+
+coverage = 0
+print "=============="
+print "never_gonna_give_u_up.err looks like:"
+with open("never_gonna_give_u_up.err") as handle:
+    for line in handle:
+        print line.rstrip("\n\r")
+print "=============="
+print "never_gonna_give_u_up.out looks like:"
+with open("never_gonna_give_u_up.out") as handle:
+    for line in handle:
+        if "never_gonna_give_u_up_coverage:" in line:
+            coverage+=int(line.rstrip("\n\r")[len("never_gonna_give_u_up_coverage:"):])
+        print line.rstrip("\n\r")
+        
+# Remove sub-routine and the error / out files
+os.remove("never_gonna_give_u_up.py")
+os.remove("never_gonna_give_u_up.err")
+os.remove("never_gonna_give_u_up.out")
         
 print "Finished recursive_simulator.py"
 print "Number of seq_context.BED files found: "+str(len(files))
