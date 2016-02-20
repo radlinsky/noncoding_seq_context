@@ -351,7 +351,7 @@ def get_seq_context(Directory, Delim, Col):
 	if len(matched) == 0:
 		raise BaseException("No 'seq_context.BED files found in directory: "+Directory)
 	
-	if len(matched) >0:
+	if len(matched) >1:
 		raise BaseException("More than 1 'seq_context.BED files found in directory: "+Directory)
 	
 	with open(matched[0], 'rb') as handle:
