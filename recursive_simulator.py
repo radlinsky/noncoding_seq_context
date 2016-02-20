@@ -83,9 +83,10 @@ if col < 0:
 files = get_seq_context_files(Directory = in_DIR)
 coverage = 0
 percent_complete = 0
-n_files = len(files)
+n_files = float(len(files))
 
-i = 0
+i = 0.0
+
 for f in files:
     parent_dir_path = os.path.dirname(f)
     
@@ -112,7 +113,7 @@ for f in files:
         print "Error caught when trying to use 'find_simulated_variants' .. initiating pdb.set_trace()"
         pdb.set_trace()
     i+=1
-    print "Percent complete: "+str(int((i/n_files)*100))
+    print "Percent complete: "+str(int((i/n_files)*100.0))
         
 print "Finished recursive_simulator.py"
 print "Number of seq_context.BED files found: "+str(len(files))
