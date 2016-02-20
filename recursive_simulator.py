@@ -38,7 +38,7 @@
 
 import sys
 from subprocess import Popen
-import pdb
+#import pdb
 import time
 
 home_base = "/project/voight_subrate/cradens/noncoding_seq_context/script/"
@@ -51,7 +51,7 @@ varun_scripts = "/project/voight_subrate/avarun/Research/mutation_rate/scripts_f
 sys.path.append(varun_scripts)
 from find_simulated_variants import *
 
-pdb.set_trace()
+#pdb.set_trace()
 
 print "Initiating recursive_simulator.py"
 print "Argument List:", str(sys.argv[1:])
@@ -133,7 +133,7 @@ for f in files:
     command += "python never_gonna_give_u_up.py "+parent_dir_path+" "+delim+" "+str(col)+" "+POP
     proc = Popen([command],shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 
-pdb.set_trace()
+#pdb.set_trace()
 
 parent_sqrd = os.path.dirname(parent_dir_path)
 all_done = False
@@ -149,8 +149,10 @@ while not all_done:
     else:
         time.sleep(5)
 
-pdb.set_trace()
+#pdb.set_trace()
 
+for f in finish_files:
+    os.remove(f)
 
 coverage = 0
 print "=============="
@@ -159,7 +161,7 @@ with open("never_gonna_give_u_up.err") as handle:
     for line in handle:
         print line.rstrip("\n\r")
         
-pdb.set_trace()
+#pdb.set_trace()
 
 print "=============="
 print "never_gonna_give_u_up.out looks like:"
@@ -170,7 +172,7 @@ with open("never_gonna_give_u_up.out") as handle:
             coverage+=int(line.rstrip("\n\r")[len("never_gonna_give_u_up_coverage:"):])
         print line.rstrip("\n\r")
 
-pdb.set_trace()
+#pdb.set_trace()
 
 # Remove sub-routine and the error / out files
 os.remove("never_gonna_give_u_up.py")
@@ -181,5 +183,5 @@ print "Finished recursive_simulator.py"
 print "Number of seq_context.BED files found: "+str(len(files))
 print "Total coverage of all fasta sequences:"
 print "Bp: "+str(coverage)
-print "Kb: "+str(coverage/1000)
-print "Mb: "+str(coverage/1000000)
+print "Kb: "+str(float(coverage)/1000.0)
+print "Mb: "+str(float(coverage)/1000000.0)
