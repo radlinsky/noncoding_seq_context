@@ -122,7 +122,7 @@ def n_variants(Directory, Pop):
 	n_files = 0
 	for f in files:
 		
-		# If .POP.SNV in fikle name, add it to the list of matched files
+		# If .POP.SNV in file name, add it to the list of matched files
 		if "."+Pop+".SNV" in f:
 			n_files = n_files+1
 			if n_files > 1:
@@ -367,7 +367,7 @@ def get_seq_context(Directory, Delim, Col):
 			line_count += 1
 			
 	if line_count != 1:
-		raise BaseException("There were "+str(line_count)+" lines in file. Expected a single line.")
+		raise BaseException("There were "+str(line_count)+" lines in file. Expected a single line. File:\n"+matched[0])
 	
 	return fasta
 		
