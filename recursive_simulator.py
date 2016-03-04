@@ -139,7 +139,7 @@ all_done = False
 # Wait until all the simulations have been run
 while not all_done:
     finish_files = list()
-    for root, sub_dir, files, in in_DIR:
+    for root, sub_dir, files, in os.walk(in_DIR):
         for f in files:
             if POP+"_never_gonna_give_u_up_FINISHED" in f:
                 finish_files.append(os.path.join(in_DIR, f))
