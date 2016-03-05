@@ -98,6 +98,8 @@ with open("cowabunga.py", 'wb') as handle:
     handle.write("\t\tnew_out_DIR = os.path.join(out_DIR, f)\n")
     handle.write("\t\tos.makedirs(new_out_DIR)\n")
     handle.write("\t\tnew_out_FILE = os.path.join(new_out_DIR, f)\n")
+    handle.write("\tf = f+r'\b'\n")
+    #handle.write("\tprint \"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+new_out_FILE")
     handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+new_out_FILE],shell=True)")
 
 
