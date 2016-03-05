@@ -83,7 +83,7 @@ if os.path.isfile("cowabunga.py"):
 with open("cowabunga.py", 'wb') as handle:
     handle.write("#!/usr/bin/python\n")
     handle.write("import sys, os, pdb\nfrom subprocess import call\n")
-    handle.write("pdb.set_trace()\n")
+    #handle.write("pdb.set_trace()\n")
     handle.write("in_FILE = str(sys.argv[1])\n")
     handle.write("files = str(sys.argv[2])\n")
     handle.write("out_DIR = str(sys.argv[3])\n")
@@ -132,7 +132,7 @@ with open(in_FILE, 'rb') as handle:
         i+=1
 lines_not_skipped = i-skip
 
-pdb.set_trace()
+#pdb.set_trace()
 
 # Want to grep 10 groups at a time from the file.
 ten = list()
@@ -154,7 +154,7 @@ for group in groups:
             ten = list()
         continue
 
-pdb.set_trace()
+#pdb.set_trace()
 
 # Wait for all groups to be written to file
 group_check = list(groups)
