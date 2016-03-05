@@ -2,26 +2,47 @@
 
 ### get_variants.py
 ### Caleb Matthew Radens
-### 2015_2_15
+### 2015_3_5
 
-### Get SNV info from a given region of the genome from a user-specified population.
+### 	Get SNV info from a given region of the genome from a user-specified population.
 ###
-### Given a directory, recursively search all folders for '.seq_context' files, look up what
-### 	variants are within the sequence context for a specified population from 1000G, then write
-### 	a separate file with the variant information in the same directory as the .seq_context file.
+### 	Given a directory, recursively search all folders for '.seq_context' files, look up what
+### 		variants are within the sequence context for a specified population from 1000G, then write
+### 		a separate file with the variant information in the same directory as the .seq_context file.
 ###
-### Assumptions:
-###	Population variant files are permenantly located at:
-###		/project/voight_subrate/avarun/Research/mutation_rate/whole_genome/
-### 	Population variant file names are formatted: 'all_var_POP_chr_loc' where POP is variable
-###	Population variant files have 7 columns without headers:
-###		chr | loci | ref_allele | variant_allele | ancesteral_allele | rsid | MAF
+###		Arguments:
+###			input_dir/: extant directory with seq_context files
+###				string
+###			POP: 3-letter code for 1000G population
+###				string
+###			chr: which column in the .seq_context file is the chr?
+###				integer >= 0
+###				default: 0
+###			start: which column in the .seq_context file is the beginning of the feature?
+###				integer >=0
+###				default: 1
+###			end: which column in the .seq_context file is the end of the feature?
+###				integer >=0
+###				default: 2
 ###
-### Depends on:
-###  /project/voight_subrate/cradens/noncoding_seq_context/script/sequence_functions.py
+###		Assumptions:
+###			Population variant files are permenantly located at:
+###				/project/voight_subrate/avarun/Research/mutation_rate/whole_genome/
+### 			Population variant file names are formatted: 'all_var_POP_chr_loc' where POP is variable
+###			population variant files have 7 columns without headers:
+###				chr | loci | ref_allele | variant_allele | ancesteral_allele | rsid | MAF
 ###
-###  Usage:
-###    python get_variants.py input_dir/ POP
+###		Note:
+###			Arguments [chr, start, end] are either all required together, unless left blank,
+###				in which case, they will be their default values
+###
+### 	Depends on:
+###  		/project/voight_subrate/cradens/noncoding_seq_context/script/sequence_functions.py
+###
+###		Usage:
+###			python get_variants.py input_dir/ POP
+###			or
+###			python get_variants.py input_dir/ POP chr start end
 
 import sys
 import os
@@ -32,18 +53,27 @@ home_base = "/project/voight_subrate/cradens/noncoding_seq_context/"
 sys.path.append(home_base+"script/")
 from sequence_functions import get_variant_dict
 
-
-
 print "Initiating get_variants.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 2):
-	raise Exception("Expected two command arguments.")
+if (len(sys.argv)-1 != 2 or len(sys.argv)-1 != 5):
+	raise Exception("Expected two or five command arguments.")
 in_dir = str(sys.argv[1])
 pop = str(sys.argv[2])
+chr_i = 0
+start_i = 1
+end_i = 2
+
+if len(sys.argv)-1 == 5:
+	chr_i = int(sys.argv[3])
+	start_i = int(sys.argv[4])
+	end_i = int(sys.argv[5])
 
 if not (os.path.isdir(in_dir)):
-	raise ValueError(in_dir+" not found. Is it a valid directory?")
+	raise ValueError(in_dir+"  not found. Is it a valid directory?")
+
+if start_i < 0 or end_i < 0 or chr_i < 0:
+	raise ValueError("chr, start, + end need to be a integers > 0")
 
 pop_dict = get_variant_dict(Pop = pop)
 # pop_dict[chrom]-> chrom_dict[loci] -> SNV_data
@@ -60,8 +90,7 @@ ACCEPTED_CHROMOSOMES = ["1","2","3","4","5","6","7","8","9","10",
 			"11","12","13","14","15","16","17","18",
 			"19","20","21","22"]
 
-#pdb.set_trace()
-
+files_with_seq_context = list()
 for bed_file in bed_files:
 	with open(bed_file, 'rb') as in_file:
 		i = 0
@@ -70,20 +99,20 @@ for bed_file in bed_files:
 
 			# Split line at ','
 			line = line.split(",")
-			chrom = line[0]
+			chrom = line[chr_i]
 			
 			# Extract # from chromosome. Expected format: 'chr#' or '#'
 			chrom = [str(s) for s in chrom.split("chr") if s.isdigit()]
 			if len(chrom) > 1:
-				raise ValueError("Unexpected chromosome format: "+line[0])
+				raise ValueError("Unexpected chromosome format: "+line[chr_i])
 			elif len(chrom) == 0:
-				chrom = line[0]
+				chrom = line[chr_i]
 			elif len(chrom) == 1:
 				chrom = chrom[0]
 			if chrom not in ACCEPTED_CHROMOSOMES:
 				raise StandardError("Chromosome '"+chrom+"' not an accepted chromosome.")
-			start = line[1]
-			end = line[2]
+			start = line[start_i]
+			end = line[end_i]
 			# If the dictionary has key == chromosome of interest
 			if pop_dict.has_key(chrom):
 				chrom_dict = pop_dict[chrom]
@@ -106,6 +135,9 @@ for bed_file in bed_files:
 				writer = csv.writer(out_file)
 				writer.writerows(snv_data)
 			print str(len(snv_data))+" variants found in file:\n"+bed_file
+			files_with_seq_context.append(bed_file)
 		else:
 			print "No variants found in file:\n"+bed_file
 		i = i + 1
+
+print "Extracted seq context from "+str(len(files_with_seq_context))+" files. Those data were saved as:\n"+str(files_with_seq_context)
