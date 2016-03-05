@@ -41,6 +41,7 @@
 import sys, os
 from subprocess import Popen
 import time
+import pdb
 
 print "Initiating grep_col.py"
 print "Argument List:", str(sys.argv[1:])
