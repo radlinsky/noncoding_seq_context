@@ -126,7 +126,7 @@ for bed_file in bed_files:
 						line_to_save.extend(chrom_dict[str(loci)])
 						snv_data.append(line_to_save)
 						
-		# If varaints were found, write them to file
+		# If variants were found, write them to file
 		if len(snv_data) != 0:
 			directory = os.path.dirname(bed_file)
 			new_file = os.path.join(directory,
