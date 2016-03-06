@@ -91,7 +91,7 @@ with open("cowabunga.py", 'wb') as handle:
     handle.write("if delim == 'tab':\n\tdelim='\t'\n")
     handle.write("Column_index = int(sys.argv[5])\n")
     handle.write("folderize = str(sys.argv[6])\n")
-    handle.write("n_cols = int(sys.argv[7])\n")
+    handle.write("last_col_i = int(sys.argv[7])\n")
     handle.write("files = files.split(',')\n")
     handle.write("col_seps = Column_index * (\".*\"+delim)\n")
     handle.write("for f in files:\n")
@@ -101,9 +101,9 @@ with open("cowabunga.py", 'wb') as handle:
     handle.write("\t\tnew_out_DIR = os.path.join(out_DIR, f)\n")
     handle.write("\t\tos.makedirs(new_out_DIR)\n")
     handle.write("\t\tnew_out_FILE = os.path.join(new_out_DIR, f)\n")
-    handle.write("if n_cols == Column_index:\n")
-    handle.write("\tf = f+'$'\n")
-    handle.write("else:\n\tf = f+delim\n")
+    handle.write("\tif last_col_i == Column_index:\n")
+    handle.write("\t\tf = f+'$'\n")
+    handle.write("\telse:\n\t\tf = f+delim\n")
     handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+new_out_FILE],shell=True)")
 
 
@@ -129,9 +129,9 @@ with open(in_FILE, 'rb') as handle:
             raise ValueError("You fool! '"+delim_check+"' isn't the delim of the file!")
         # Otherwise, get those unique elements from the col of interest
         split_line = line.rstrip('\r\n').split(delim_check)
-        n_cols = len(split_line)
+        last_col_i = len(split_line) - 1
         if split_line[Column_index] > 0: 
-            groups.add(line.rstrip('\r\n').split(delim_check)[Column_index])
+            groups.add(split_line[Column_index])
         else:
             raise ValueError("Line "+str(i)+" was empty in col of interest.")
         i+=1
@@ -151,7 +151,7 @@ for group in groups:
         # Join each element with a comma
         joined=",".join(ten)
         # Generate the sys command
-        command = in_FILE+" "+joined+" "+out_DIR+" "+delim+" "+str(Column_index)+" "+folderize + " " + str(n_cols)
+        command = in_FILE+" "+joined+" "+out_DIR+" "+delim+" "+str(Column_index)+" "+folderize + " " + str(last_col_i)
         # Submit a system command, without waiting. Save error files just in case.
         proc = Popen(["bsub -e cowabunga.err -o cowabunga.out -q voight_normal python cowabunga.py "+command],shell=True,
             stdin=None, stdout=None, stderr=None, close_fds=True)
