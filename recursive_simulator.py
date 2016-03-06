@@ -142,7 +142,7 @@ while not all_done:
     for root, sub_dir, filez, in os.walk(in_DIR):
         for f in filez:
             if POP+"_never_gonna_give_u_up_FINISHED" in f:
-                finish_files.append(os.path.join(in_DIR, f))
+                finish_files.append(os.path.join(root, f))
     if len(finish_files) == n_files:
         all_done = True
     else:

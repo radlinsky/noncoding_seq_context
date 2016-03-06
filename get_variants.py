@@ -56,7 +56,7 @@ from sequence_functions import get_variant_dict
 print "Initiating get_variants.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 2 or len(sys.argv)-1 != 5):
+if (len(sys.argv)-1 != 2 and len(sys.argv)-1 != 5):
 	raise Exception("Expected two or five command arguments.")
 in_dir = str(sys.argv[1])
 pop = str(sys.argv[2])
