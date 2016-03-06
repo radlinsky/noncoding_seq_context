@@ -128,8 +128,9 @@ with open(in_FILE, 'rb') as handle:
         if delim_check not in line:
             raise ValueError("You fool! '"+delim_check+"' isn't the delim of the file!")
         # Otherwise, get those unique elements from the col of interest
-        n_cols = len(line.rstrip('\r\n').split(delim_check)[Column_index])
-        if n_cols > 0: 
+        split_line = line.rstrip('\r\n').split(delim_check)
+        n_cols = len(split_line)
+        if split_line[Column_index] > 0: 
             groups.add(line.rstrip('\r\n').split(delim_check)[Column_index])
         else:
             raise ValueError("Line "+str(i)+" was empty in col of interest.")
