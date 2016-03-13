@@ -2,7 +2,7 @@
 
 ### recursive_simulator.py
 ### Caleb Matthew Radens
-### 2015_2_20
+### 2015_3_5
 
 ###    This script recursively searches a directory for sub-directories that contain 
 ###        *.seq_context.BED files and uses Varun's intergenic polymorphism rate
@@ -101,7 +101,6 @@ with open(sub_routine, 'wb') as handle:
     handle.write("from find_simulated_variants import *\n")
     handle.write("in_DIR = str(sys.argv[1])\n")
     handle.write("delim = str(sys.argv[2])\n")
-    handle.write("if delim == 'tab':\n\tdelim='\t'\n")
     handle.write("Column_index = int(sys.argv[3])\n")
     handle.write("Pop = str(sys.argv[4])\n")
     handle.write("fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index)\n")
@@ -150,6 +149,10 @@ while not all_done:
 
 #pdb.set_trace()
 
+#TODO: there is a delay between all '_never_gonna_give_u_up_FINISHED' files
+#     being written and the error files actually getting written...
+#         I'm not properly gathering all the error/out files and they aren't all getting saved into this
+#        script's out file
 for f in finish_files:
     os.remove(f)
 
