@@ -75,13 +75,24 @@ if len(in_files) <= 0:
 if len(delim) <= 0:
 	raise ValueError("delim must be of length > 0.")
 
+# If tab-delimited, need to make sure it will be python-interpretable:
+if delim != "," and delim != "tab":
+	raise ValueError("This script was only tested with ',' or 'tab', not '"+delim+"'")
+
+# Convert delim to '\t' if it is tab
+if delim == "tab":
+	delim_check = '\t'
+# Else delim is kept the same ',' in this case
+else:
+	delim_check = delim
+
 if skip < 0:
 	raise ValueError("skip needs to be integer >= 0.")
 
 # from bash, >>> python \t sends a 't' to python. >>> python $'\t' sends \t.
 #    this little check assumes user meant \t
-if "t" in delim and len(delim)==1:
-	delim = "\t"
+#if "t" in delim and len(delim)==1:
+#	delim = "\t"
 
 if chrom_i < 0 or start_i < 0 or end_i < 0:
 	raise ValueError("Column indeces need to be an integers >= 0.")
@@ -115,10 +126,10 @@ for full_file_name in in_files:
 				i+=1
 				continue
 			
-			if delim not in line:
-				raise ValueError("Delim '"+delim+"' not found in line # "+str(i))
+			if delim_check not in line:
+				raise ValueError("Delim '"+delim_check+"' not found in line # "+str(i))
 			# Add line to all_lines
-			split_line = line.rstrip('\r\n').split(delim)
+			split_line = line.rstrip('\r\n').split(delim_check)
 			chrom = split_line[chrom_i]
 			
 			# Extract # from chromosome. Expected format: 'chr#' or '#'
