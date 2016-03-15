@@ -377,7 +377,7 @@ def get_seq_context(Directory, Delim, Col, Start = 0, End = 0):
 			
 			line_count += 1
 			
-	if line_count != Line:
+	if line_count != End:
 		raise BaseException("Couldn't retrieve sequence from file:\n"+matched[0])
 	
 	if len(fasta) == 1:
