@@ -14,7 +14,7 @@ Column_index = int(sys.argv[3])
 Pop = str(sys.argv[4])
 Line_s= int(sys.argv[5])
 Line_e= int(sys.argv[6])
-fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Start = Line_s, End = Line_end)
+fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Start = Line_s, End = Line_e)
 
 for Line in xrange(Line_s,Line_e):
     seq = fasta[Line]
