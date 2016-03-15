@@ -49,6 +49,7 @@ from find_context import get_seq_context_interval
 caleb_scripts = "/project/voight_subrate/cradens/noncoding_seq_context/script/generally_useful"
 sys.path.append(caleb_scripts)
 import csv
+import pdb
 
 print "Initiating add_seq_context_col.py"
 print "Argument List:", str(sys.argv[1:])
@@ -147,6 +148,7 @@ for full_file_name in in_files:
 			start = split_line[start_i]
 			end = split_line[end_i]
 			if start >= end:
+				pdb.set_trace()
 				raise ValueError("Start is >= End at line:\n"+line)
 			sequence = get_seq_context_interval(chrom,start,end,padding)
 			split_line.append(sequence)
