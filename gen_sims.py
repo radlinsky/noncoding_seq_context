@@ -7,6 +7,7 @@ from sequence_functions import *
 varun_scripts = '/project/voight_subrate/avarun/Research/mutation_rate/scripts_for_folks'
 sys.path.append(varun_scripts)
 from find_simulated_variants import *
+pdb.set_trace()
 in_DIR = str(sys.argv[1])
 delim = str(sys.argv[2])
 Column_index = int(sys.argv[3])
