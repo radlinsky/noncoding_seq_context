@@ -306,7 +306,7 @@ def get_seq_context_files(Directory):
 				
 	return matched_files
 	
-def get_seq_context(Directory, Delim, Col):
+def get_seq_context(Directory, Delim, Col, Lines):
 	"""
 		Given a directory with a ".seq_context.BED" file, return the sequence context
 		
@@ -316,10 +316,12 @@ def get_seq_context(Directory, Delim, Col):
 				str: 'tab' or ','
 			Col: integer >= 0
 				int
+			Lines: integer >=1
 		
 		Assumptions:
 			Sequence is in given column, in fasta format
-			There is only one line in the seq_context.BED file
+			There is only one line in the seq_context.BED file, unless otherwise specified with
+				Lines
 			
 		Returns:
 			fasta sequence (str)
@@ -366,8 +368,8 @@ def get_seq_context(Directory, Delim, Col):
 			
 			line_count += 1
 			
-	if line_count != 1:
-		raise BaseException("There were "+str(line_count)+" lines in file. Expected a single line. File:\n"+matched[0])
+	if line_count != Lines:
+		raise BaseException("There were "+str(line_count)+" lines in file. Expected" + str(get_seq_context)+ "line(s). File:\n"+matched[0])
 	
 	return fasta
 		
