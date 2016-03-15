@@ -7,7 +7,7 @@ from sequence_functions import *
 varun_scripts = '/project/voight_subrate/avarun/Research/mutation_rate/scripts_for_folks'
 sys.path.append(varun_scripts)
 from find_simulated_variants import *
-pdb.set_trace()
+#pdb.set_trace()
 in_DIR = str(sys.argv[1])
 delim = str(sys.argv[2])
 Column_index = int(sys.argv[3])
@@ -16,7 +16,7 @@ Line_s= int(sys.argv[5])
 Line_e= int(sys.argv[6])
 fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Start = Line_s, End = Line_e)
 
-for Line in xrange(Line_s,Line_e+1):
+for Line in xrange(0,Line_e-Line_s + 1):
     seq = fasta[Line]
     new_file_path = os.path.join(in_DIR,Pop+'_1000_sim'+"_"+str(Line))
     find_simulated_variants(fastaseq = seq, pop = Pop, filesave = new_file_path, nsim = 1000)
