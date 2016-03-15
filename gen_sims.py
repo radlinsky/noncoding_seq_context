@@ -12,20 +12,16 @@ in_DIR = str(sys.argv[1])
 delim = str(sys.argv[2])
 Column_index = int(sys.argv[3])
 Pop = str(sys.argv[4])
-Line= int(sys.argv[5])
-fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Line = Line)
-if len(fasta) == 0:
-    raise ValueError('Fasta sequence not found in directory: '+in_DIR)
-if fasta == 'NA':
-    raise ValueError('Fasta sequence was NA in directory: '+in_DIR)
-A = fasta.count('A')
-T = fasta.count('T')
-C = fasta.count('C')
-G = fasta.count('G')
-if A+T+C+G != len(fasta):
-    raise ValueError('Fasta sequence had characters other than A, T, C, and G in dir: '+in_DIR)
-new_file_path = os.path.join(in_DIR,Pop+'_1000_sim'+"_"+str(Line))
-find_simulated_variants(fastaseq = fasta, pop = Pop, filesave = new_file_path, nsim = 1000)
-finish_file = os.path.join(in_DIR,Pop+'_FINISHED_'+str(Line))
-with open(finish_file, 'wb'):
-    pass
+Line_s= int(sys.argv[5])
+Line_e= int(sys.argv[6])
+fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Start = Line_s, End = Line_end)
+
+for Line in xrange(Line_s,Line_e):
+    seq = fasta[Line]
+    new_file_path = os.path.join(in_DIR,Pop+'_1000_sim'+"_"+str(Line))
+    find_simulated_variants(fastaseq = seq, pop = Pop, filesave = new_file_path, nsim = 1000)
+    finish_file = os.path.join(in_DIR,Pop+'_FINISHED_'+str(Line))
+    print "Finish file written to:"
+    print finish_file
+    with open(finish_file, 'wb'):
+        pass

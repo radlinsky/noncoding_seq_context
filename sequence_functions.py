@@ -306,7 +306,7 @@ def get_seq_context_files(Directory):
 				
 	return matched_files
 	
-def get_seq_context(Directory, Delim, Col, Line = 0):
+def get_seq_context(Directory, Delim, Col, Start = 0, End = 0):
 	"""
 		Given a directory with a ".seq_context.BED" file, return the sequence context
 		
@@ -316,13 +316,13 @@ def get_seq_context(Directory, Delim, Col, Line = 0):
 				str: 'tab' or ','
 			Col: integer >= 0
 				int
-			Line: which line should sequence be retrieved from?
+			Start, End: which lines should sequence be retrieved from?
 				integer >=0
 		
 		Assumptions:
 			Sequence is in given column, in fasta format
 			There is only one line in the seq_context.BED file, unless otherwise specified with
-				Lines
+				Lines 
 			
 		Returns:
 			fasta sequence (str)
@@ -357,6 +357,8 @@ def get_seq_context(Directory, Delim, Col, Line = 0):
 	if len(matched) >1:
 		raise BaseException("More than 1 'seq_context.BED files found in directory: "+Directory)
 		
+	fasta = list()
+	
 	with open(matched[0], 'rb') as handle:
 		line_count = 0
 		for line in handle:
@@ -365,8 +367,10 @@ def get_seq_context(Directory, Delim, Col, Line = 0):
 			
 			split_line = line.rstrip("\n\r").split(delim)
 			
-			if line_count == Line:
-				fasta = split_line[Col]
+			if line_count == Start:
+				fasta.append(split_line[Col])
+			if line_count == End:
+				fasta.append(split_line[Col])
 				break
 			
 			line_count += 1
@@ -374,7 +378,10 @@ def get_seq_context(Directory, Delim, Col, Line = 0):
 	if line_count != Line:
 		raise BaseException("Couldn't retrieve sequence from file:\n"+matched[0])
 	
-	return fasta
+	if len(fasta) == 1:
+		return fasta[0]
+	else:
+		return fasta
 		
 	
 	
