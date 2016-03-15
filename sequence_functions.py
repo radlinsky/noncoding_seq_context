@@ -367,7 +367,7 @@ def get_seq_context(Directory, Delim, Col, Start = 0, End = 0):
 			
 			split_line = line.rstrip("\n\r").split(delim)
 			
-			if line_count == Start:
+			if line_count >= Start:
 				fasta.append(split_line[Col])
 				if line_count == End:
 					break
