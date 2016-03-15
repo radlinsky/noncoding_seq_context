@@ -145,10 +145,10 @@ for full_file_name in in_files:
 				print "'"+chrom+"' isn't an accepted chromosome at line # "+str(i)+" in file: "+file_name
 				i+=1
 				continue
-			start = split_line[start_i]
-			end = split_line[end_i]
+			start = int(split_line[start_i])
+			end = int(split_line[end_i])
 			if start >= end:
-				pdb.set_trace()
+				#pdb.set_trace()
 				raise ValueError("Start is >= End at line:\n"+line)
 			sequence = get_seq_context_interval(chrom,start,end,padding)
 			split_line.append(sequence)
