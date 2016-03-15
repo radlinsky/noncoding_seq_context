@@ -16,11 +16,12 @@ Line_s= int(sys.argv[5])
 Line_e= int(sys.argv[6])
 fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Start = Line_s, End = Line_e)
 
-for Line in xrange(0,Line_e-Line_s + 1):
+n_lines = Line_e-Line_s
+for Line in xrange(0,n_lines+1):
     seq = fasta[Line]
-    new_file_path = os.path.join(in_DIR,Pop+'_1000_sim'+"_"+str(Line))
+    new_file_path = os.path.join(in_DIR,Pop+'_1000_sim'+"_"+str(Line_s+Line))
     find_simulated_variants(fastaseq = seq, pop = Pop, filesave = new_file_path, nsim = 1000)
-    finish_file = os.path.join(in_DIR,Pop+'_FINISHED_'+str(Line))
+    finish_file = os.path.join(in_DIR,Pop+'_FINISHED_'+str(Line_s+Line))
     print "Finish file written to:"
     print finish_file
     with open(finish_file, 'wb'):
