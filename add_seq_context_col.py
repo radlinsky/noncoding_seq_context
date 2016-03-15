@@ -147,7 +147,7 @@ for full_file_name in in_files:
 			start = split_line[start_i]
 			end = split_line[end_i]
 			if start >= end:
-				raise ValueError("Start is >= End at line # "+str(i))
+				raise ValueError("Start is >= End at line:\n"+line)
 			sequence = get_seq_context_interval(chrom,start,end,padding)
 			split_line.append(sequence)
 			new_lines.append(split_line)
