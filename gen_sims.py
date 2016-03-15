@@ -12,7 +12,7 @@ in_DIR = str(sys.argv[1])
 delim = str(sys.argv[2])
 Column_index = int(sys.argv[3])
 Pop = str(sys.argv[4])
-Line= int(sys.argv(5))
+Line= int(sys.argv[5])
 fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Lines = Line)
 if len(fasta) == 0:
     raise ValueError('Fasta sequence not found in directory: '+in_DIR)
