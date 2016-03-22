@@ -19,6 +19,10 @@
 ###                integer, valid row index
 ###            Line_e: which row to end pulling fasta sequence from?
 ###                integer, valid row index
+###        
+###        Note:
+###            Also writes to file the results+"_FINISHED" so you can check to make sure all the rows
+###                you expected to generate simulations for actually got simulated.
 ###
 ###        Depends:
 ###            On Varun's find_simulated_variants module [see file path below]
@@ -43,9 +47,11 @@ Column_index = int(sys.argv[3])
 Pop = str(sys.argv[4])
 Line_s= int(sys.argv[5])
 Line_e= int(sys.argv[6])
+
 fasta = get_seq_context(Directory = in_DIR, Delim = delim, Col = Column_index, Start = Line_s, End = Line_e)
 
 n_lines = Line_e-Line_s
+
 for Line in xrange(0,n_lines+1):
     seq = fasta[Line]
     new_file_path = os.path.join(in_DIR,Pop+'_1000_sim'+"_"+str(Line_s+Line))
